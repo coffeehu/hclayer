@@ -1,0 +1,301 @@
+.hclayer{
+	position: fixed;
+	min-width: 100px;
+	max-width: 360px;
+	border-radius: 2px;
+	background: #fff;
+	box-shadow: 2px 1px 50px rgba(0,0,0,.3);
+	-webkit-overflow-scrolling: touch;
+}
+.hclayer-dialog{
+	min-width: 260px;
+}
+.hclayer-msg{
+	box-shadow: none;
+	text-align: center;
+}
+.hclayer-style-black{
+	background: rgba(0,0,0,0.6);
+	color: #fff;
+}
+
+/*遮罩层*/
+.hclayer-shade{
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: #000;
+	opacity: 0.3;
+}
+/*标题*/
+.hclayer-title{
+	height: 42px;
+	line-height: 42px;
+	background: #f8f8f8;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	border-top-left-radius: 2px;
+	border-top-right-radius: 2px;
+	border-bottom: 1px solid #eee;
+	padding-left: 20px;
+}
+/*关闭按钮*/
+.hclayer-close{
+	position: absolute;
+	top: 0;
+	right: 15px;
+	height: 42px;
+	line-height: 42px;
+}
+.hclayer-close:hover{
+	opacity: 0.9;
+}
+.hclayer-close-2{ /*适用于无title情况*/
+	right: 12px;
+	height: 32px;
+	line-height: 32px;
+}
+.hclayer-close::before{
+	content: 'x';
+	cursor: pointer;
+}
+/*内容*/
+.hclayer-content{
+	padding: 20px;
+}
+.hclayer-msg .hclayer-content{
+	padding: 15px;
+}
+/*按钮*/
+.hclayer-btn{
+	text-align: right;
+	padding-bottom: 10px;
+	padding-right: 20px;
+}
+.hclayer-btn a{
+	display: inline-block;
+	height: 28px;
+	line-height: 28px;
+	padding: 0 15px;
+	border-radius: 2px;
+	border: 1px solid #dedede;
+	cursor: pointer;
+	margin-left: 20px;
+}
+.hclayer-btn a:hover{
+	opacity: 0.9;
+}
+.hclayer-btn a.hclayer-btn-yes{
+	color: #fff;
+	background: #1E9FFF;
+	border-color: #1E9FFF;
+}
+/*加载*/
+.hclayer-load{
+	box-shadow: none;
+}
+.hclayer.hclayer-load{
+	width: auto;
+	min-width: 0;
+	background: transparent;
+}
+.hclayer-load .hclayer-content{
+	padding: 0;
+}
+/*---------动画----------*/
+.hclayer-anim{
+	-webkit-animation-duration:.3s;
+			animation-duration:.3s;
+	-webkit-animation-fill-mode: both;
+			animation-fill-mode: both;
+}
+/*弹出*/
+.hclayer-anim-00{
+	-webkit-animation-name: layer-bounceIn;
+			animation-name: layer-bounceIn;
+}
+@keyframes layer-bounceIn{
+	0%{
+		opacity: 0;
+		transform: scale(.5);
+	}
+	100%{
+		opacity: 1;
+		transform: scale(1);
+	}
+}
+@-webkit-keyframes layer-bounceIn{
+	0%{
+		opacity: 0;
+		transform: scale(.5);
+	}
+	100%{
+		opacity: 1;
+		transform: scale(1);
+	}
+}
+/*关闭*/
+.hclayer-anim-close{
+	-webkit-animation-name: layer-bounceOut;
+			animation-name: layer-bounceOut;
+	-webkit-animation-duration:.3s;
+			animation-duration:.3s;
+	-webkit-animation-fill-mode: both;
+			animation-fill-mode: both;
+}
+@keyframes layer-bounceOut{
+	0%{
+		transform: scale(1);
+	}
+	50%{
+		transform: scale(1.05);
+	}
+	100%{
+		opacity: 0;
+		transform: scale(.7);
+	}
+}
+
+/*加载动画*/
+.hcload1{
+	position: relative;
+	width: 36px;
+	height: 36px;
+	margin: auto;
+	margin-top: 15%;
+}
+.hcload1 .hcload-lines{
+	position: relative;
+	width: 100%;
+	height: 100%;
+}
+.hcload1 .hcload-lines > div{
+	position: absolute;
+	width: 3px;
+	height: 100%;
+	left: 0;
+	right: 0;
+	margin: 0 auto;
+}
+.hcload1 .hcload-lines > div:before,
+.hcload1 .hcload-lines > div:after{
+	position: absolute;
+	content: "";
+	height: 25%;
+	width: 100%;
+	background: #7b7b7b;
+	border-radius: 3px;
+}
+.hcload1 .hcload-lines > div:before{
+	top: 0;
+}
+.hcload1 .hcload-lines > div:after{
+	bottom: 0;
+}
+.hcload1 .hcload-lines > div:nth-child(2){
+	-webkit-transform:rotate(30deg);
+}
+.hcload1 .hcload-lines > div:nth-child(3){
+	-webkit-transform:rotate(60deg);
+}
+.hcload1 .hcload-lines > div:nth-child(4){
+	-webkit-transform:rotate(90deg);
+}
+.hcload1 .hcload-lines > div:nth-child(5){
+	-webkit-transform:rotate(120deg);
+}
+.hcload1 .hcload-lines > div:nth-child(6){
+	-webkit-transform:rotate(150deg);
+}
+/*动画*/
+@-webkit-keyframes load{
+    0%{opacity:0;}
+    100%{opacity:1;}
+}
+.hcload1 .hcload-lines > div:nth-child(1):before{
+	-webkit-animation:load .96s linear 0s infinite;
+}
+.hcload1 .hcload-lines > div:nth-child(2):before{
+	-webkit-animation:load .96s linear .08s infinite;
+}
+.hcload1 .hcload-lines > div:nth-child(3):before{
+	-webkit-animation:load .96s linear .16s infinite;
+}
+.hcload1 .hcload-lines > div:nth-child(4):before{
+	-webkit-animation:load .96s linear .24s infinite;
+}
+.hcload1 .hcload-lines > div:nth-child(5):before{
+	-webkit-animation:load .96s linear .32s infinite;
+}
+.hcload1 .hcload-lines > div:nth-child(6):before{
+	-webkit-animation:load .96s linear .4s infinite;
+}
+.hcload1 .hcload-lines > div:after{
+	-webkit-animation:load .96s linear .48s infinite;
+}
+.hcload1 .hcload-lines > div:nth-child(2):after{
+	-webkit-animation:load .96s linear .56s infinite;
+}
+.hcload1 .hcload-lines > div:nth-child(3):after{
+	-webkit-animation:load .96s linear .64s infinite;
+}
+.hcload1 .hcload-lines > div:nth-child(4):after{
+	-webkit-animation:load .96s linear .72s infinite;
+}
+.hcload1 .hcload-lines > div:nth-child(5):after{
+	-webkit-animation:load .96s linear .8s infinite;
+}
+.hcload1 .hcload-lines > div:nth-child(6):after{
+	-webkit-animation:load .96s linear .88s infinite;
+}
+
+.hcload2{
+	height: 28px;
+	width: 28px;
+	border-radius: 50%;
+	border: 2px solid #eee;
+	border-top: 2px solid #1E9FFF;
+	-webkit-animation: rotation .8s infinite linear;
+    -moz-animation: rotation .8s infinite linear;
+    -o-animation: rotation .8s infinite linear;
+    animation: rotation .8s infinite linear;
+}
+@-webkit-keyframes rotation {
+    from {
+        -webkit-transform: rotate(0deg)
+    }
+
+    to {
+        -webkit-transform: rotate(359deg)
+    }
+}
+@-moz-keyframes rotation {
+    from {
+        -moz-transform: rotate(0deg)
+    }
+
+    to {
+        -moz-transform: rotate(359deg)
+    }
+}
+@-o-keyframes rotation {
+    from {
+        -o-transform: rotate(0deg)
+    }
+
+    to {
+        -o-transform: rotate(359deg)
+    }
+}
+@keyframes rotation {
+    from {
+        transform: rotate(0deg)
+    }
+
+    to {
+        transform: rotate(359deg)
+    }
+}

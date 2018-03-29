@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<!-- <link rel="stylesheet" type="text/css" href="css/hclayer.css"> -->
+	<script src="js/hclayer.js"></script>
+	<style type="text/css">
+		#test{
+			background: red;
+			position: static;
+			/*width: 200px;
+			height: 100px;
+			padding: 12px;
+			margin: 30px;
+			border: 5px solid blue;*/
+		}
+		#test2{
+			background: red;
+			position: static;
+			width: 200px;
+			height: 100px;
+			padding: 12px;
+			margin: 30px;
+			border: 5px solid blue;
+		}
+
+	</style>
+</head>
+<body>
+	<div id="test">hhhh</div>
+	<div id="test2">hhhh</div>
+
+
+<script type="text/javascript">
+	var test = document.getElementById('test');
+	var test2 = document.getElementById('test2');
+	hclayer.msg('hehe');
+	test.onclick = function(){
+		//hclayer.alert('hehe xixi');
+		/*hclayer.alert({
+			content:'hehe xixi',
+			title:'标题'
+		})*/
+		hclayer.load();
+	}
+
+	test2.onclick = function(){
+		hclayer.alert({
+			content:'hehe xixi',
+			title:'标题'
+		})
+	}
+	
+
+
+
+</script>
+</body>
+</html>
