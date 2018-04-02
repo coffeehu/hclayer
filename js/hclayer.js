@@ -425,11 +425,12 @@ var hclayer = window.hclayer = {
 	close:function(index){
 		var id = 'hclayer'+index;
 		var main = document.getElementById(id);
-		if(main===null) return;
-		utils.addClass(main,'hclayer-anim-close');
-		setTimeout(function(){
-			utils.remove(main);
-		},200);	
+		if(main){
+			utils.addClass(main,'hclayer-anim-close');
+			setTimeout(function(){
+				utils.remove(main);
+			},200);	
+		}
 
 		/*遮罩层*/
 		var sId = 'hclayer-shade'+index;
