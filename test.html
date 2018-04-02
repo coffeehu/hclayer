@@ -16,7 +16,7 @@
 		}
 		#test2{
 			background: red;
-			position: static;
+			position: relative;
 			width: 200px;
 			height: 100px;
 			padding: 12px;
@@ -29,6 +29,7 @@
 <body>
 	<div id="test">hhhh</div>
 	<div id="test2">hhhh</div>
+	
 
 
 <script type="text/javascript">
@@ -45,10 +46,15 @@
 	}
 
 	test2.onclick = function(){
-		hclayer.alert({
+		/*hclayer.alert({
 			content:'hehe xixi',
-			title:'标题'
-		})
+			title:'标题',
+			parent:'test2'
+		})*/
+		hclayer.load({
+			load:2,
+			parent:'test2'
+		});
 	}
 	
 

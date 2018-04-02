@@ -7,6 +7,9 @@
 	box-shadow: 2px 1px 50px rgba(0,0,0,.3);
 	-webkit-overflow-scrolling: touch;
 }
+.hclayer.hclayer-child{
+	position: absolute;
+}
 .hclayer-dialog{
 	min-width: 260px;
 }
@@ -165,7 +168,7 @@
 	width: 36px;
 	height: 36px;
 	margin: auto;
-	margin-top: 15%;
+	/*margin-top: 15%;*/
 }
 .hcload1 .hcload-lines{
 	position: relative;

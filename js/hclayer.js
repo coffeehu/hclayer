@@ -386,11 +386,21 @@ var hclayer = window.hclayer = {
 		return o.index;
 	},
 
-	// type:1-菊花转动；2-圆形旋转
-	load:function(type){
+	/*
+		opt为数字时，表示加载类型（字段load）：1-菊花转动；2-圆形旋转
+		opt为对象时，parent 参数指明其父元素
+	*/
+	load:function(opt){
 		var content = '';
-		var type = type?type:1;
-		switch(type){
+		var parent = null,
+			load = null;
+		if(typeof opt === 'object'){
+			parent = opt.parent;
+			load = opt.load?opt.load:1;
+		}else{
+			load = opt?opt:1;
+		}
+		switch(load){
 			case 1:
 				content = '<div class="hcload1"><div class="hcload-lines">'+
 						'<div></div><div></div><div></div><div></div><div></div><div></div>'+
@@ -404,7 +414,8 @@ var hclayer = window.hclayer = {
 		var opt = {
 			type:2,
 			content:content,
-			shade:0.01
+			shade:0.01,
+			parent:parent
 		}
 		var o = new Layer(opt);
 		return o.index;
@@ -538,7 +549,20 @@ Layer.prototype.create = function(){
 	}
 	
 	main.innerHTML = htmlContainer.join('');
-	document.body.appendChild(main);
+	/*
+		弹框的父元素默认为 body 元素。
+		parent可指定父元素，一般用于 load() 函数
+	*/
+	if(that.config.parent){
+		var p = document.getElementById(that.config.parent);
+		if(p){
+			utils.addClass(main,'hclayer-child');
+			p.appendChild(main);
+		}
+	}else{
+		document.body.appendChild(main);	
+	}
+	
 
     /*
     	bug:chrome浏览器，alert,移动到确定按钮后，页面出现白色的“花版”;
@@ -605,10 +629,28 @@ Layer.prototype.setOffset = function(){
 	var that = this,
 		main = that.main,
 		area = [utils.outWidth(main),utils.outHeight(main)];
-	var offset = that.offset = {
-		left: (utils.width(window) - area[0])/2,
-		top: (utils.height(window) - area[1])/2
+	var offset = null;
+
+	// 当指定 parent 父元素时，根据指定元素确定弹框位置
+	if(that.config.parent){
+		var p = document.getElementById(that.config.parent);
+		if(p){
+			var _left = (utils.inWidth(p) - area[0])/2;
+			var _right = (utils.inHeight(p) - area[1])/2;
+			offset = that.offset = {
+				left: _left>0?_left:0,
+				top: _right>0?_right:0
+			}
+		}
 	}
+	// 默认以可视窗口为父元素
+	else{
+		offset = that.offset = {
+			left: (utils.width(window) - area[0])/2,
+			top: (utils.height(window) - area[1])/2
+		}
+	}
+
 	utils.css(main,{left:offset.left, top:offset.top});
 }
 
