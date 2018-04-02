@@ -436,7 +436,9 @@ var hclayer = window.hclayer = {
 		var sId = 'hclayer-shade'+index;
 		var shade = document.getElementById(sId);
 		if(shade){
-			utils.remove(shade);
+			setTimeout(function(){
+				utils.remove(shade);
+			},200);	
 		}
 	},
 	//关闭所有弹窗
