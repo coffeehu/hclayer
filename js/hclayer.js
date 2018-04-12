@@ -481,6 +481,7 @@ Layer.prototype.create = function(){
 	var views = {
 		shade:function(){
 			if(!that.config.shade) return '';
+			if( document.getElementsByClassName('hclayer-shade')[0] ) return; //避免重复添加 shade
 			var shade = document.createElement('div');
 			utils.addClass(shade,'hclayer-shade');
 			var op = (typeof that.config.shade === 'number')?that.config.shade:0.3;
