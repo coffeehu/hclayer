@@ -10,6 +10,15 @@
 .hclayer.hclayer-child{
 	position: absolute;
 }
+.hclayer-is-relative {
+	position: relative!important;
+}
+.hclayer-load-mask.hclayer-is-full {
+	position: fixed!important;
+}
+.hclayer-is-lock {
+	overflow: hidden!important;
+}
 .hclayer-dialog{
 	min-width: 260px;
 }
@@ -96,7 +105,7 @@
 	background: #1E9FFF;
 	border-color: #1E9FFF;
 }
-/*加载*/
+/*-------------------加载---------------*/
 .hclayer-load{
 	box-shadow: none;
 }
@@ -107,6 +116,22 @@
 }
 .hclayer-load .hclayer-content{
 	padding: 0;
+}
+.hclayer-load-mask {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	background: rgba(255,255,255,0.6);
+}
+.hclayer-load-spinner {
+	position: absolute;
+	top: 50%;
+	-webkit-transform: translateY(-50%);
+	transform: translateY(-50%);
+	width: 100%;
+	text-align: center;
 }
 /*---------动画----------*/
 .hclayer-anim{
@@ -164,10 +189,9 @@
 
 /*加载动画*/
 .hcload1{
-	position: relative;
+	display: inline-block;
 	width: 36px;
 	height: 36px;
-	margin: auto;
 	/*margin-top: 15%;*/
 }
 .hcload1 .hcload-lines{
@@ -256,6 +280,7 @@
 }
 
 .hcload2{
+	display: inline-block;
 	height: 28px;
 	width: 28px;
 	border-radius: 50%;
@@ -301,4 +326,49 @@
     to {
         transform: rotate(359deg)
     }
+}
+.loading-circle-wrapper {
+  -webkit-animation: h-roate 2s ease-in-out infinite;
+  animation: h-roate 2s ease-in-out infinite;
+}
+@-webkit-keyframes h-roate {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+@keyframes h-roate {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.loading-circle {
+  stroke: #409EFF;
+  stroke-dasharray:234,380;
+  animation: h-loading 1.5s ease-in-out infinite;
+}
+@-webkit-keyframes h-loading {
+  0% {
+    stroke-dasharray:5,500;
+  }
+  50% {
+    stroke-dasharray:234,380;
+    stroke-dashoffset: -40;
+  }
+  100% {
+    stroke-dasharray:234,380;
+    stroke-dashoffset: -288;
+  }
+}
+@keyframes h-loading {
+  0% {
+    stroke-dasharray:5,500;
+  }
+  50% {
+    stroke-dasharray:234,380;
+    stroke-dashoffset: -40;
+  }
+  100% {
+    stroke-dasharray:234,380;
+    stroke-dashoffset: -288;
+  }
 }

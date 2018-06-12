@@ -391,33 +391,43 @@ var hclayer = window.hclayer = {
 		opt为对象时，parent 参数指明其父元素
 	*/
 	load:function(opt){
-		var content = '';
+		var content = '<div class="hclayer-load-spinner">';
 		var parent = null,
-			load = null;
+			load = null,
+			lock = opt ? opt.lock : false;
 		if(typeof opt === 'object'){
 			parent = opt.parent;
 			load = opt.load?opt.load:1;
 		}else{
 			load = opt?opt:1;
 		}
+
 		switch(load){
 			case 1:
-				content = '<div class="hcload1"><div class="hcload-lines">'+
+				content += '<svg class="loading-circle-wrapper" width="45" height="45" viewBox="0 0 100 100" >\
+								<circle class="loading-circle" cx="50" cy="50" r="46" fill="none" stroke-width="4"></circle>\
+							</svg>';
+				break;
+			case 2: 
+				content += '<div class="hcload1"><div class="hcload-lines">'+
 						'<div></div><div></div><div></div><div></div><div></div><div></div>'+
 						'</div></div>';
 				break;
-			case 2:
-				content = '<div class="hcload2"></div>';
+			case 3:
+				content += '<div class="hcload2"></div>';
 				break;
-		}
 
-		var opt = {
-			type:2,
-			content:content,
-			shade:0.01,
-			parent:parent
 		}
-		var o = new Layer(opt);
+		content += '</div>';
+
+		var option = {
+			type: 2,
+			content: content,
+			shade: false,
+			parent: parent,
+			lock: lock
+		}
+		var o = new Layer(option);
 		return o.index;
 	},
 
@@ -429,6 +439,14 @@ var hclayer = window.hclayer = {
 			utils.addClass(main,'hclayer-anim-close');
 			setTimeout(function(){
 				utils.remove(main);
+
+				// 移除父类添加的 is-relative 类
+				if(main._parent) {
+					utils.removeClass(main._parent, 'hclayer-is-relative');
+					main._parent = null;
+				}
+				utils.removeClass(document.body, 'hclayer-is-lock');
+
 			},200);	
 		}
 
@@ -452,13 +470,8 @@ var hclayer = window.hclayer = {
 	}
 }
 
-function Layer(opt){
-	this.config = utils.extend({},this.config,opt);
-	this.index = ++hclayer.index;
-	this.create();
-}
 
-Layer.prototype.config = {
+var config = {
 	shade:false, //遮罩层
 	title:false, //标题
 	close:false, //关闭按钮
@@ -469,9 +482,17 @@ Layer.prototype.config = {
 	move:false, //可否拖动
 	zIndex:12345678,
 	time:0,  //为0时不自动关闭
-	type:0,  // 0-msg, 1-alert
+	type:0,  // 0-msg, 1-alert, 2-load
 	maxWidth: 360,
+	lock: false, //锁滚动条
 };
+
+function Layer(opt){
+	this.config = utils.extend({}, config, opt);
+	this.index = ++hclayer.index;
+	this.create();
+}
+
 
 Layer.prototype.create = function(){
 	var that = this,
@@ -505,6 +526,9 @@ Layer.prototype.create = function(){
 			return html;
 		},
 		content:function(){
+			if(that.config.type === 2) {  // 类型为 load 时
+				return that.config.content;
+			}
 			return '<div class="hclayer-content">'+that.config.content+'</div>';
 		},
 		btn:function(){
@@ -539,8 +563,8 @@ Layer.prototype.create = function(){
 		case 1: // alert
 			style = 'hclayer hclayer-dialog';
 			break;
-		case 2:
-			style = 'hclayer hclayer-load';
+		case 2: // load
+			style = that.config.parent ? 'hclayer-load-mask' : 'hclayer-load-mask hclayer-is-full';
 	}
 	utils.addClass(main,style);
 
@@ -560,11 +584,20 @@ Layer.prototype.create = function(){
 	if(that.config.parent){
 		var p = document.getElementById(that.config.parent);
 		if(p){
-			utils.addClass(main,'hclayer-child');
+			//若 parent 为 static，则强制设为 relative（记得移除）
+			var position = utils.css(p, 'position');
+			if(position !== 'absolute' && position !== 'fixed' && position !== 'relative') {
+				utils.addClass(p, 'hclayer-is-relative');
+			}
+			//utils.addClass(main,'hclayer-child');
 			p.appendChild(main);
+			main._parent = p;
 		}
 	}else{
-		document.body.appendChild(main);	
+		if(that.config.lock) {
+			utils.addClass(document.body, 'hclayer-is-lock'); 
+		}
+		document.body.appendChild(main);
 	}
 	
 
@@ -587,8 +620,10 @@ Layer.prototype.create = function(){
 		},this.config.time);	
 	}
 	
-	that.autoSize();
-	that.setOffset();
+	if(that.config.type !== 2){
+		that.autoSize();
+		that.setOffset();
+	}
 
 	if(that.config.move){
 		that.move();
