@@ -499,6 +499,79 @@ Layer.prototype.create = function(){
 		key,
 		htmlContainer = [];
 
+	var p = null, // 用于 load，其父元素
+		loadMask = null; //用于 load，load 本体元素
+
+	if(that.config.parent){
+		p = document.getElementById(that.config.parent);
+		loadMask = p.getElementsByClassName('hclayer-load-mask')[0];
+	}
+
+	if(loadMask) {  // 若父元素里已有了 load 元素，则无需重新渲染 html
+		loadMask.setAttribute('hclayer-id',that.index);
+		return;
+	}
+
+	var main = that._createMain();
+	
+	/*
+		弹框的父元素默认为 body 元素。
+		parent可指定父元素，一般用于 load() 函数
+	*/
+	if(p){
+		//若 parent 为 static，则强制设为 relative（记得移除）
+		var position = utils.css(p, 'position');
+		if(position !== 'absolute' && position !== 'fixed' && position !== 'relative') {
+			utils.addClass(p, 'hclayer-is-relative');
+		}
+		//utils.addClass(main,'hclayer-child');
+		p.appendChild(main);
+		main._parent = p;
+	}else{
+		if(that.config.lock) {
+			utils.addClass(document.body, 'hclayer-is-lock'); 
+		}
+		document.body.appendChild(main);
+	}
+
+    /*
+    	bug:chrome浏览器，alert,移动到确定按钮后，页面出现白色的“花版”;
+    	移除掉 anim class 后正常。
+    	TDO:'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend'
+    */
+    utils.one(that.main,'animationend',function(){
+    	utils.removeClass(that.main,'hclayer-anim hclayer-anim-00');
+    })
+
+	//点击事件绑定
+	that.listener();
+
+	// 自动关闭
+	if(that.config.time !== 0){
+		setTimeout(function(){
+			hclayer.close(that.index);
+		}, this.config.time);	
+	}
+	
+	if(that.config.type !== 2){
+		that.autoSize();
+		that.setOffset();
+	}
+
+	if(that.config.move){
+		that.move();
+	}
+
+	//TDO:多次点击生成msg，避免重复监听
+	utils.addHandler(window,'resize',function(){
+		that.setOffset();
+	})
+}
+Layer.prototype._createMain = function() {
+	var that = this,
+		key,
+		htmlContainer = [];
+
 	var views = {
 		shade:function(){
 			if(!that.config.shade) return '';
@@ -549,6 +622,7 @@ Layer.prototype.create = function(){
 		htmlContainer.push( views[key]() );
 	}
 
+
 	//主体
 	var main = this.main = document.createElement('div');
 	main.setAttribute('hclayer-id',that.index);
@@ -577,62 +651,8 @@ Layer.prototype.create = function(){
 	}
 	
 	main.innerHTML = htmlContainer.join('');
-	/*
-		弹框的父元素默认为 body 元素。
-		parent可指定父元素，一般用于 load() 函数
-	*/
-	if(that.config.parent){
-		var p = document.getElementById(that.config.parent);
-		if(p){
-			//若 parent 为 static，则强制设为 relative（记得移除）
-			var position = utils.css(p, 'position');
-			if(position !== 'absolute' && position !== 'fixed' && position !== 'relative') {
-				utils.addClass(p, 'hclayer-is-relative');
-			}
-			//utils.addClass(main,'hclayer-child');
-			p.appendChild(main);
-			main._parent = p;
-		}
-	}else{
-		if(that.config.lock) {
-			utils.addClass(document.body, 'hclayer-is-lock'); 
-		}
-		document.body.appendChild(main);
-	}
-	
 
-    /*
-    	bug:chrome浏览器，alert,移动到确定按钮后，页面出现白色的“花版”;
-    	移除掉 anim class 后正常。
-    	TDO:'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend'
-    */
-    utils.one(that.main,'animationend',function(){
-    	utils.removeClass(that.main,'hclayer-anim hclayer-anim-00');
-    })
-
-	//点击事件绑定
-	that.listener();
-
-	// 自动关闭
-	if(that.config.time !== 0){
-		setTimeout(function(){
-			hclayer.close(that.index);
-		},this.config.time);	
-	}
-	
-	if(that.config.type !== 2){
-		that.autoSize();
-		that.setOffset();
-	}
-
-	if(that.config.move){
-		that.move();
-	}
-
-	//TDO:多次点击生成msg，避免重复监听
-	utils.addHandler(window,'resize',function(){
-		that.setOffset();
-	})
+	return main;
 }
 
 /*自适应高宽*/
