@@ -588,7 +588,7 @@ Layer.prototype._createMain = function() {
 		},
 		title:function(){
 			if(!that.config.title) {
-				if(that.type === 1){ // alert: 当没有 title 时，也应该返回一个空白的填充元素，否则不美观。
+				if(that.config.type === 1){ // alert: 当没有 title 时，也应该返回一个空白的填充元素，否则不美观。
 					return '<div style="height:20px"></div>';
 				}else{
 					return '';
