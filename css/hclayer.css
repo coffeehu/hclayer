@@ -1,7 +1,11 @@
+.hc-is-center {
+	text-align: center!important;
+}
+
 .hclayer{
 	position: fixed;
 	min-width: 100px;
-	max-width: 360px;
+	/*max-width: 360px;*/
 	border-radius: 2px;
 	background: #fff;
 	box-shadow: 2px 1px 50px rgba(0,0,0,.3);
@@ -20,9 +24,14 @@
 	overflow: hidden!important;
 }
 .hclayer-dialog{
-	min-width: 260px;
+	/*min-width: 260px;*/
+	width: 420px;
+	border-radius: 4px;
+	overflow: hidden;
 }
 .hclayer-msg{
+	max-width: 360px;
+	min-width: 260px;
 	box-shadow: none;
 	text-align: center;
 }
@@ -45,14 +54,18 @@
 .hclayer-title{
 	height: 42px;
 	line-height: 42px;
-	background: #f8f8f8;
+	/*background: #f8f8f8;*/
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	border-top-left-radius: 2px;
 	border-top-right-radius: 2px;
-	border-bottom: 1px solid #eee;
+	/*border-bottom: 1px solid #eee;*/
 	padding-left: 20px;
+	font-size: 18px;
+}
+.hc-is-center .hclayer-title {
+	padding-left: 0;
 }
 /*关闭按钮*/
 .hclayer-close{
@@ -77,6 +90,7 @@
 /*内容*/
 .hclayer-content{
 	padding: 20px;
+	font-size: 14px;
 }
 .hclayer-msg .hclayer-content{
 	padding: 15px;
@@ -84,8 +98,12 @@
 /*按钮*/
 .hclayer-btn{
 	text-align: right;
-	padding-bottom: 10px;
+	padding-bottom: 15px;
 	padding-right: 20px;
+}
+.hc-is-center .hclayer-btn {
+	text-align: center;
+	padding-bottom: 20px;
 }
 .hclayer-btn a{
 	display: inline-block;
@@ -96,6 +114,7 @@
 	border: 1px solid #dedede;
 	cursor: pointer;
 	margin-left: 20px;
+	font-size: 12px;
 }
 .hclayer-btn a:hover{
 	opacity: 0.9;
@@ -218,9 +237,11 @@
 }
 .hcload1 .hcload-lines > div:before{
 	top: 0;
+	left: 0;
 }
 .hcload1 .hcload-lines > div:after{
 	bottom: 0;
+	left: 0;
 }
 .hcload1 .hcload-lines > div:nth-child(2){
 	-webkit-transform:rotate(30deg);

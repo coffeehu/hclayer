@@ -93,6 +93,18 @@
 <body>
 <div style="text-align: center;">
 
+	<div class="module-wrapper root-module loading-module">
+      <h1>message</h1>
+     </div>
+
+     <div class="module-wrapper root-module loading-module">
+      <h1>alert</h1>
+      <button id="alert1">默认</button>
+      <button id="alert2">标题</button>
+      <button id="alert3">文本居中</button>
+      <button id="alert4">按钮</button>
+      <button id="alert5">拖拽</button>
+     </div>
 
 	 <div class="module-wrapper root-module loading-module">
       <h1>loading</h1>
@@ -139,8 +151,46 @@
 		return document.getElementById(id);
 	}
 
-	hclayer.msg('hehe');
+	/*----------- meg 弹出信息 ----------------*/
+	//hclayer.msg('hehe');
 
+	/*----------- alert 弹出框 ----------------*/
+	$('alert1').onclick = function(){
+		hclayer.alert('hello');
+	}
+	$('alert2').onclick = function(){
+		hclayer.alert({
+			content: '字段 titleBackground 可以设置标题栏的背景颜色',
+			title: 'title'
+		});
+	}
+	$('alert3').onclick = function(){
+		hclayer.alert({
+			content: '文本可以居中',
+			title: 'title',
+			center: true,
+		});
+	}
+	$('alert4').onclick = function(){
+		hclayer.alert({
+			content: '字段 no 设置取消按钮',
+			no: '取消',
+			noCallback: function(index){
+				hclayer.close(index);
+				hclayer.msg('取消');
+			},
+			title: 'title'
+		});
+	}
+	$('alert5').onclick = function(){
+		hclayer.alert({
+			content: '有标题的时候，可通过 move 字段设置拖拽',
+			title: 'title',
+			move: true
+		});
+	}
+
+	/*----------- loading 载入动画 ----------------*/
 	$('loading1').onclick = function() {
 		var loadId = hclayer.load();
 		setTimeout(function(){

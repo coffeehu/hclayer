@@ -363,23 +363,23 @@ var hclayer = window.hclayer = {
 			opt = {
 				type:1,
 				shade:true,
-				title:'title',
+				title:'',
 				close:true,
 				content:content,
 				btn:true,
-				yes:'yes',
-				move:true
+				yes:'确定',
+				move:false
 			}
 		}else if(typeof content === 'object'){
 			opt = utils.extend({},{
 				type:1,
 				shade:true,
-				title:'title',
+				title:'',
 				close:true,
 				content:content,
 				btn:true,
-				yes:'yes',
-				move:true
+				yes:'确定',
+				move:false
 			},content);
 		}
 		var o = new Layer(opt);
@@ -474,6 +474,7 @@ var hclayer = window.hclayer = {
 var config = {
 	shade:false, //遮罩层
 	title:false, //标题
+	//titleBackground: '#fff', //标题背景颜色
 	close:false, //关闭按钮
 	//content: //内容
 	btn:false, //底部按钮
@@ -483,8 +484,9 @@ var config = {
 	zIndex:12345678,
 	time:0,  //为0时不自动关闭
 	type:0,  // 0-msg, 1-alert, 2-load
-	maxWidth: 360,
+	maxWidth: 420,
 	lock: false, //锁滚动条
+	center: false, //内容居中
 };
 
 function Layer(opt){
@@ -585,7 +587,17 @@ Layer.prototype._createMain = function() {
 			return '';
 		},
 		title:function(){
-			if(!that.config.title) return '';
+			if(!that.config.title) {
+				if(that.type === 1){ // alert: 当没有 title 时，也应该返回一个空白的填充元素，否则不美观。
+					return '<div style="height:20px"></div>';
+				}else{
+					return '';
+				}
+			}
+			if(that.config.titleBackground) {
+				return '<div class="hclayer-title" style="background:'+that.config.titleBackground+'">'+that.config.title+'</div>';
+			}
+			
 			return '<div class="hclayer-title">'+that.config.title+'</div>';
 		},
 		close:function(){
@@ -607,11 +619,11 @@ Layer.prototype._createMain = function() {
 		btn:function(){
 			if(!that.config.btn) return '';
 			var html = '<div class="hclayer-btn">';
-			if(that.config.yes){
-				html += '<a class="hclayer-btn-yes">'+that.config.yes+'</a>';
-			}
 			if(that.config.no){
 				html += '<a class="hclayer-btn-no">'+that.config.no+'</a>';
+			}
+			if(that.config.yes){
+				html += '<a class="hclayer-btn-yes">'+that.config.yes+'</a>';
 			}
 			html += '</div>'
 			return html;
@@ -640,14 +652,18 @@ Layer.prototype._createMain = function() {
 		case 2: // load
 			style = that.config.parent ? 'hclayer-load-mask' : 'hclayer-load-mask hclayer-is-full';
 	}
+	if(that.config.center) {
+		style += ' hc-is-center ';
+	}
 	utils.addClass(main,style);
 
 	// 动画
 	utils.addClass(main, 'hclayer-anim hclayer-anim-00');
 
 	// 关闭所有
-	if(that.config.type !== 2){
-		hclayer.closeAll('dialog');	
+	if(that.config.type === 0){
+		//hclayer.closeAll('dialog');
+		hclayer.closeAll('msg');	
 	}
 	
 	main.innerHTML = htmlContainer.join('');
@@ -758,16 +774,18 @@ Layer.prototype.move = function(){
 		startMove = false,
 		offset;
 
-	utils.css(title,'cursor','move');
+	if(title) {
+		utils.css(title,'cursor','move');
 
-	utils.addHandler(title,'mousedown',function(e){
-		e.preventDefault(); // 附赠功能：title的文字不会被选中
-		offset = [
-			e.clientX - parseFloat( utils.css(that.main,'left') ),
-			e.clientY - parseFloat( utils.css(that.main,'top') ),
-		]
-		startMove = true;
-	});
+		utils.addHandler(title,'mousedown',function(e){
+			e.preventDefault(); // 附赠功能：title的文字不会被选中
+			offset = [
+				e.clientX - parseFloat( utils.css(that.main,'left') ),
+				e.clientY - parseFloat( utils.css(that.main,'top') ),
+			]
+			startMove = true;
+		});
+	}
 
 	utils.addHandler(document,'mousemove',function(e){
 		if(startMove){
