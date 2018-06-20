@@ -342,15 +342,17 @@ var hclayer = window.hclayer = {
 		var opt = null;
 		if(typeof content === 'string'){
 			opt = {
-				type:0,
-				content:content,
-				time:3000
+				type: 'msg',
+				content: content,
+				time: 3000,
+				maxWidth: 360
 			}
 		}else if(typeof content === 'object'){
 			opt = utils.extend({},{
-				type:0,
+				type: 'msg',
 				content:content,
-				time:3000
+				time:3000,
+				maxWidth: 360
 			},content);
 		}
 		var o = new Layer(opt);
@@ -361,7 +363,7 @@ var hclayer = window.hclayer = {
 		var opt = null;
 		if(typeof content === 'string'){
 			opt = {
-				type:1,
+				type: 'alert',
 				shade:true,
 				title:'',
 				close:true,
@@ -372,7 +374,7 @@ var hclayer = window.hclayer = {
 			}
 		}else if(typeof content === 'object'){
 			opt = utils.extend({},{
-				type:1,
+				type: 'alert',
 				shade:true,
 				title:'',
 				close:true,
@@ -402,6 +404,7 @@ var hclayer = window.hclayer = {
 			load = opt?opt:1;
 		}
 
+		// load 动画的类型
 		switch(load){
 			case 1:
 				content += '<svg class="loading-circle-wrapper" width="45" height="45" viewBox="0 0 100 100" >\
@@ -421,7 +424,7 @@ var hclayer = window.hclayer = {
 		content += '</div>';
 
 		var option = {
-			type: 2,
+			type: 'load',
 			content: content,
 			shade: false,
 			parent: parent,
@@ -483,7 +486,7 @@ var config = {
 	move:false, //可否拖动
 	zIndex:12345678,
 	time:0,  //为0时不自动关闭
-	type:0,  // 0-msg, 1-alert, 2-load
+	type: 'msg',  // msg, alert, load
 	maxWidth: 420,
 	lock: false, //锁滚动条
 	center: false, //内容居中
@@ -555,19 +558,21 @@ Layer.prototype.create = function(){
 		}, this.config.time);	
 	}
 	
-	if(that.config.type !== 2){
+	// msg 时调整大小与位置
+	if(that.config.type === 'msg'){
 		that.autoSize();
 		that.setOffset();
+		//TDO:多次点击生成msg，避免重复监听
+		utils.addHandler(window,'resize',function(){
+			that.setOffset();
+		})
 	}
 
+	//开启拖拽
 	if(that.config.move){
 		that.move();
 	}
 
-	//TDO:多次点击生成msg，避免重复监听
-	utils.addHandler(window,'resize',function(){
-		that.setOffset();
-	})
 }
 Layer.prototype._createMain = function() {
 	var that = this,
@@ -588,7 +593,7 @@ Layer.prototype._createMain = function() {
 		},
 		title:function(){
 			if(!that.config.title) {
-				if(that.config.type === 1){ // alert: 当没有 title 时，也应该返回一个空白的填充元素，否则不美观。
+				if(that.config.type === 'alert'){ // alert: 当没有 title 时，也应该返回一个空白的填充元素，否则不美观。
 					return '<div style="height:20px"></div>';
 				}else{
 					return '';
@@ -611,7 +616,7 @@ Layer.prototype._createMain = function() {
 			return html;
 		},
 		content:function(){
-			if(that.config.type === 2) {  // 类型为 load 时
+			if(that.config.type === 'load') {  // 类型为 load 时
 				return that.config.content;
 			}
 			return '<div class="hclayer-content">'+that.config.content+'</div>';
@@ -634,22 +639,19 @@ Layer.prototype._createMain = function() {
 		htmlContainer.push( views[key]() );
 	}
 
-
 	//主体
 	var main = this.main = document.createElement('div');
-	main.setAttribute('hclayer-id',that.index);
-	main.setAttribute('id','hclayer'+that.index);
-	utils.css(main,'zIndex',that.config.zIndex);
 
+	//设置对应的 class
 	var style = '';
 	switch(that.config.type){
-		case 0: // msg
+		case 'msg': // msg
 			style = 'hclayer hclayer-dialog hclayer-msg hclayer-style-black';
 			break;
-		case 1: // alert
-			style = 'hclayer hclayer-dialog';
+		case 'alert': // alert
+			style = 'hclayer hclayer-dialog hclayer-alert';
 			break;
-		case 2: // load
+		case 'load': // load
 			style = that.config.parent ? 'hclayer-load-mask' : 'hclayer-load-mask hclayer-is-full';
 	}
 	if(that.config.center) {
@@ -661,12 +663,24 @@ Layer.prototype._createMain = function() {
 	utils.addClass(main, 'hclayer-anim hclayer-anim-00');
 
 	// 关闭所有
-	if(that.config.type === 0){
+	if(that.config.type === 'msg'){
 		//hclayer.closeAll('dialog');
 		hclayer.closeAll('msg');	
 	}
 	
 	main.innerHTML = htmlContainer.join('');
+
+	// alert 需要加一个全屏的 wrapper，用于居中
+	if(that.config.type === 'alert') {
+		var _main = main;
+		main = document.createElement('div');
+		main.className = "hclayer-alert-wrapper";
+		main.appendChild(_main);
+	}
+
+	utils.css(main,'zIndex',that.config.zIndex);
+	main.setAttribute('hclayer-id',that.index);
+	main.setAttribute('id','hclayer'+that.index);
 
 	return main;
 }
@@ -705,6 +719,8 @@ Layer.prototype.setOffset = function(){
 		main = that.main,
 		area = [utils.outWidth(main),utils.outHeight(main)];
 	var offset = null;
+
+	console.log(area[0], area[1])
 
 	// 当指定 parent 父元素时，根据指定元素确定弹框位置
 	if(that.config.parent){

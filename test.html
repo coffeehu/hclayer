@@ -152,7 +152,10 @@
 	}
 
 	/*----------- meg 弹出信息 ----------------*/
-	//hclayer.msg('hehe');
+	hclayer.msg({
+		content: 'hehe',
+		time: 0
+	});
 
 	/*----------- alert 弹出框 ----------------*/
 	$('alert1').onclick = function(){
@@ -177,7 +180,7 @@
 			no: '取消',
 			noCallback: function(index){
 				hclayer.close(index);
-				hclayer.msg('取消');
+				hclayer.msg('已取消');
 			},
 			title: 'title'
 		});
