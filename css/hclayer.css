@@ -83,9 +83,6 @@
 	padding: 20px;
 	font-size: 14px;
 }
-.hclayer-msg .hclayer-content{
-	padding: 15px;
-}
 /*按钮*/
 .hclayer-btn{
 	text-align: right;
@@ -122,6 +119,10 @@
 	min-width: 260px;
 	box-shadow: none;
 	text-align: center;
+}
+.hclayer-msg .hclayer-content{
+	padding: 15px;
+	font-size: 16px;
 }
 /*-------------------alert---------------*/
 .hclayer-alert-wrapper {
@@ -177,8 +178,8 @@
 }
 /*---------动画----------*/
 .hclayer-anim{
-	-webkit-animation-duration:.3s;
-			animation-duration:.3s;
+	-webkit-animation-duration: .3s;
+			animation-duration: .3s;
 	-webkit-animation-fill-mode: both;
 			animation-fill-mode: both;
 }
@@ -414,5 +415,65 @@
   100% {
     stroke-dasharray:234,380;
     stroke-dashoffset: -288;
+  }
+}
+/*转动动画：小花旋转*/
+.h-loading-flower-sm{
+  position: relative;
+  width: 20px;
+  height: 20px;
+  margin: auto;
+}
+.h-loading-flower-sm .lines{
+  position: relative;
+  width: 100%;
+  height: 100%;
+  -webkit-animation:h-roate 1.2s linear infinite;
+}
+.h-loading-flower-sm .lines > div{
+  position: absolute;
+  width: 2px;
+  height: 100%;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+}
+.h-loading-flower-sm .lines > div:before,
+.h-loading-flower-sm .lines > div:after{
+  position: absolute;
+  left: 0;
+  content: "";
+  height: 25%;
+  width: 100%;
+  background: #7b7b7b;
+  border-radius: 3px;
+}
+.h-loading-flower-sm .lines > div:before{
+  top: 0;
+}
+.h-loading-flower-sm .lines > div:after{
+  bottom: 0;
+}
+.h-loading-flower-sm .lines > div:nth-child(2){
+  -webkit-transform:rotate(45deg);
+}
+.h-loading-flower-sm .lines > div:nth-child(3){
+  -webkit-transform:rotate(90deg);
+}
+.h-loading-flower-sm .lines > div:nth-child(4){
+  -webkit-transform:rotate(135deg);
+}
+.h-loading-flower-sm .lines > div:nth-child(5){
+  -webkit-transform:rotate(180deg);
+}
+/*转动*/
+@-webkit-keyframes h-roate {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+@keyframes h-roate {
+  100% {
+    transform: rotate(360deg);
   }
 }

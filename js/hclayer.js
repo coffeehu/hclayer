@@ -332,7 +332,12 @@ var utils = {
     }
 };
 
-utils.addcss();
+/*
+	TODO:
+	开启自动载入 css 后，若 html 页面只有 loading 模块（页面长度比较短？），弹出 msg 无异常；
+	HTML 页面新增了 alert、msg 模块后（页面变长了？），弹出 msg 样式会发生偏移
+*/
+//utils.addcss();
 
 
 var hclayer = window.hclayer = {
@@ -419,6 +424,10 @@ var hclayer = window.hclayer = {
 			case 3:
 				content += '<div class="hcload2"></div>';
 				break;
+			case 4:
+				content += '<div class="h-loading-flower-sm">'+
+			    		'<div class="lines"><div></div><div></div><div></div><div></div></div></div>';
+				break;
 
 		}
 		content += '</div>';
@@ -487,7 +496,7 @@ var config = {
 	zIndex:12345678,
 	time:0,  //为0时不自动关闭
 	type: 'msg',  // msg, alert, load
-	maxWidth: 420,
+	maxWidth: 360,
 	lock: false, //锁滚动条
 	center: false, //内容居中
 };
@@ -497,7 +506,6 @@ function Layer(opt){
 	this.index = ++hclayer.index;
 	this.create();
 }
-
 
 Layer.prototype.create = function(){
 	var that = this,
@@ -560,7 +568,7 @@ Layer.prototype.create = function(){
 	
 	// msg 时调整大小与位置
 	if(that.config.type === 'msg'){
-		that.autoSize();
+		//that.autoSize();
 		that.setOffset();
 		//TDO:多次点击生成msg，避免重复监听
 		utils.addHandler(window,'resize',function(){
@@ -720,8 +728,6 @@ Layer.prototype.setOffset = function(){
 		area = [utils.outWidth(main),utils.outHeight(main)];
 	var offset = null;
 
-	console.log(area[0], area[1])
-
 	// 当指定 parent 父元素时，根据指定元素确定弹框位置
 	if(that.config.parent){
 		var p = document.getElementById(that.config.parent);
@@ -795,6 +801,17 @@ Layer.prototype.move = function(){
 
 		utils.addHandler(title,'mousedown',function(e){
 			e.preventDefault(); // 附赠功能：title的文字不会被选中
+
+			//------------设置 main 为 fixed 且居中位置------------
+			if( utils.css(that.main, 'position') !== 'fixed' ){
+				var area = [utils.outWidth(that.main),utils.outHeight(that.main)];
+				var left = (utils.width(window) - area[0])/2,
+					top = (utils.height(window) - area[1])/2;
+
+				utils.css(that.main,{position:'fixed', left:left, top:top});
+			}
+			//------------设置 END------------------
+
 			offset = [
 				e.clientX - parseFloat( utils.css(that.main,'left') ),
 				e.clientY - parseFloat( utils.css(that.main,'top') ),
