@@ -1,6 +1,12 @@
 .hc-is-center {
 	text-align: center!important;
 }
+.hc-is-inlineblock {
+	display: inline-block!important;
+}
+.hc-is-middle {
+	vertical-align: middle!important;
+}
 .hclayer{
 	min-width: 100px;
 	/*max-width: 360px;*/
@@ -176,6 +182,18 @@
 	width: 100%;
 	text-align: center;
 }
+.hclayer-load-text {
+	margin: 0;
+	margin-top: 3px;
+	padding: 0;
+	font-size: 14px;
+	color: #666;
+	text-align: center;
+}
+.hc-is-inlineblock.hclayer-load-text {
+	margin-top: 0;
+	margin-left: 5px;
+}
 /*---------动画----------*/
 .hclayer-anim{
 	-webkit-animation-duration: .3s;
@@ -184,7 +202,7 @@
 			animation-fill-mode: both;
 }
 /*弹出*/
-.hclayer-anim-00{
+.hclayer-anim-bounceIn{
 	-webkit-animation-name: layer-bounceIn;
 			animation-name: layer-bounceIn;
 }
@@ -206,6 +224,27 @@
 	100%{
 		opacity: 1;
 		transform: scale(1);
+	}
+}
+/*渐隐显出*/
+.hclayer-anim-fadeIn{
+	-webkit-animation-name: layer-fadeIn;
+			animation-name: layer-fadeIn;
+}
+@keyframes layer-fadeIn{
+	0%{
+		opacity: 0;
+	}
+	100%{
+		opacity: 1;
+	}
+}
+@-webkit-keyframes layer-fadeIn{
+	0%{
+		opacity: 0;
+	}
+	100%{
+		opacity: 1;
 	}
 }
 /*关闭*/

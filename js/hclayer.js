@@ -398,38 +398,44 @@ var hclayer = window.hclayer = {
 		opt为对象时，parent 参数指明其父元素
 	*/
 	load:function(opt){
+		var isHorizontal = opt && opt.loadText && opt.horizontal ? ' hc-is-inlineblock hc-is-middle ' : ''; //若是有加载文字，且为水平显示时，置为inline-block
 		var content = '<div class="hclayer-load-spinner">';
 		var parent = null,
 			load = null,
 			lock = opt ? opt.lock : false;
 		if(typeof opt === 'object'){
 			parent = opt.parent;
-			load = opt.load?opt.load:1;
+			load = opt.load ? opt.load : 1;
 		}else{
-			load = opt?opt:1;
+			load = opt ? opt : 1;
 		}
 
 		// load 动画的类型
 		switch(load){
 			case 1:
-				content += '<svg class="loading-circle-wrapper" width="45" height="45" viewBox="0 0 100 100" >\
+				content += '<svg class="loading-circle-wrapper '+ isHorizontal +'" width="45" height="45" viewBox="0 0 100 100" >\
 								<circle class="loading-circle" cx="50" cy="50" r="46" fill="none" stroke-width="4"></circle>\
 							</svg>';
 				break;
 			case 2: 
-				content += '<div class="hcload1"><div class="hcload-lines">'+
-						'<div></div><div></div><div></div><div></div><div></div><div></div>'+
-						'</div></div>';
+				content += '<div class="hcload1 '+ isHorizontal +'"><div class="hcload-lines">'+
+							'<div></div><div></div><div></div><div></div><div></div><div></div>'+
+						   '</div></div>';
 				break;
 			case 3:
-				content += '<div class="hcload2"></div>';
+				content += '<div class="hcload2 '+ isHorizontal +'"></div>';
 				break;
 			case 4:
-				content += '<div class="h-loading-flower-sm">'+
-			    		'<div class="lines"><div></div><div></div><div></div><div></div></div></div>';
+				content += '<div class="h-loading-flower-sm '+ isHorizontal +'">'+
+			    			'<div class="lines"><div></div><div></div><div></div><div></div></div>'+
+			    		   '</div>';
 				break;
-
 		}
+
+		if(opt && opt.loadText) {
+			content += '<p class="hclayer-load-text '+ isHorizontal +'">'+ opt.loadText +'</p>';
+		}
+
 		content += '</div>';
 
 		var option = {
@@ -452,12 +458,14 @@ var hclayer = window.hclayer = {
 			setTimeout(function(){
 				utils.remove(main);
 
-				// 移除父类添加的 is-relative 类
+				// load()：移除父类添加的 is-relative 类
 				if(main._parent) {
 					utils.removeClass(main._parent, 'hclayer-is-relative');
 					main._parent = null;
 				}
-				utils.removeClass(document.body, 'hclayer-is-lock');
+				if(main.shouldRmoveLock) { //表明该弹框弹出时做了 lock 操作，因此此时需要解除 lock
+					utils.removeClass(document.body, 'hclayer-is-lock');
+				}
 
 			},200);	
 		}
@@ -543,6 +551,11 @@ Layer.prototype.create = function(){
 	}else{
 		if(that.config.lock) {
 			utils.addClass(document.body, 'hclayer-is-lock'); 
+			/* 
+				添加一个标识，表示对于这个弹窗，关闭时需要执行解除 lock 操作；
+				若不这样做的话，所有的 close() 关闭弹框调用都会执行解除 lock 操作，造成不需要的影响
+			*/
+			main.shouldRmoveLock = true;
 		}
 		document.body.appendChild(main);
 	}
@@ -553,7 +566,7 @@ Layer.prototype.create = function(){
     	TDO:'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend'
     */
     utils.one(that.main,'animationend',function(){
-    	utils.removeClass(that.main,'hclayer-anim hclayer-anim-00');
+    	utils.removeClass(that.main,'hclayer-anim hclayer-anim-bounceIn');
     })
 
 	//点击事件绑定
@@ -665,10 +678,14 @@ Layer.prototype._createMain = function() {
 	if(that.config.center) {
 		style += ' hc-is-center ';
 	}
-	utils.addClass(main,style);
+	utils.addClass(main, style);
 
 	// 动画
-	utils.addClass(main, 'hclayer-anim hclayer-anim-00');
+	if(that.config.type === 'load') {
+		utils.addClass(main, 'hclayer-anim hclayer-anim-fadeIn');
+	}else {
+		utils.addClass(main, 'hclayer-anim hclayer-anim-bounceIn');	
+	}
 
 	// 关闭所有
 	if(that.config.type === 'msg'){

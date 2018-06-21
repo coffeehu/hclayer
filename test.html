@@ -130,13 +130,13 @@
       </div>
 
       <div>
-        <div style="background:pink;width:100%;height:200px;margin-bottom:20px"></div>
-        <button id="loading6">文字1</button>  
+        <div id="loadingBlock5" style="background:pink;width:100%;height:200px;margin-bottom:20px"></div>
+        <button id="loading5">文字1</button>  
       </div>
 
       <div>
-        <div style="background:pink;width:100%;height:200px;margin-bottom:20px"></div>
-        <button id="loading7">文字2</button>  
+        <div id="loadingBlock6" style="background:pink;width:100%;height:200px;margin-bottom:20px"></div>
+        <button id="loading6">文字2</button>  
       </div>
 
     </div>
@@ -252,7 +252,33 @@
 		}		
 	}
 
-	
+	var loadId5 = null;
+	$('loading5').onclick = function() {
+		if(loadId5 === null) {
+			loadId5 = hclayer.load({
+				loadText: 'loadText设置文本',
+				parent:'loadingBlock5',
+			});
+		}else {
+			hclayer.close(loadId5);
+			loadId5 = null;
+		}		
+	}
+
+	var loadId6 = null;
+	$('loading6').onclick = function() {
+		if(loadId6 === null) {
+			loadId6 = hclayer.load({
+				load: 4,
+				loadText: 'horizontal:true',
+				parent:'loadingBlock6',
+				horizontal: true
+			});
+		}else {
+			hclayer.close(loadId6);
+			loadId6 = null;
+		}		
+	}	
 	
 	
 
