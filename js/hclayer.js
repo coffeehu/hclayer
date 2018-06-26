@@ -199,6 +199,16 @@ var utils = {
 		}
 		return el;
 	},
+	hasClass:function(el,value){
+		var className = ' '+value+' ';
+		var curValue = el.getAttribute && el.getAttribute('class') || '';
+		var cur = ' '+this.stripAndCollapse(curValue)+' ';
+
+		if(cur.indexOf(className) > -1){
+			return true;
+		}
+		return false;
+	},
 	addClass:function(el, value){
 		var classes = this.classesToArray(value),
 		curValue,cur,j,clazz,finalValue;
@@ -395,17 +405,19 @@ var hclayer = window.hclayer = {
 
 	/*
 		opt为数字时，表示加载类型（字段load）：1-菊花转动；2-圆形旋转
-		opt为对象时，parent 参数指明其父元素
+		opt为对象时，opt.parent 参数指明其父元素
 	*/
 	load:function(opt){
 		var isHorizontal = opt && opt.loadText && opt.horizontal ? ' hc-is-inlineblock hc-is-middle ' : ''; //若是有加载文字，且为水平显示时，置为inline-block
 		var content = '<div class="hclayer-load-spinner">';
 		var parent = null,
 			load = null,
-			lock = opt ? opt.lock : false;
+			lock = opt ? opt.lock : false,
+			background = null;
 		if(typeof opt === 'object'){
 			parent = opt.parent;
 			load = opt.load ? opt.load : 1;
+			background = opt.background;
 		}else{
 			load = opt ? opt : 1;
 		}
@@ -443,7 +455,8 @@ var hclayer = window.hclayer = {
 			content: content,
 			shade: false,
 			parent: parent,
-			lock: lock
+			lock: lock,
+			background: background
 		}
 		var o = new Layer(option);
 		return o.index;
@@ -454,7 +467,12 @@ var hclayer = window.hclayer = {
 		var id = 'hclayer'+index;
 		var main = document.getElementById(id);
 		if(main){
-			utils.addClass(main,'hclayer-anim-close');
+			//因为 load 和 alert/msg 的关闭动画不一样，所以要区分
+			if(utils.hasClass(main, 'hclayer-load-mask')) { 
+				utils.addClass(main,'hclayer-anim-closeFade');
+			} else {
+				utils.addClass(main,'hclayer-anim-closeBounce');
+			}
 			setTimeout(function(){
 				utils.remove(main);
 
@@ -507,6 +525,7 @@ var config = {
 	maxWidth: 360,
 	lock: false, //锁滚动条
 	center: false, //内容居中
+	//background: // 控制 alert、load 的背景颜色
 };
 
 function Layer(opt){
@@ -607,7 +626,7 @@ Layer.prototype._createMain = function() {
 			var shade = document.createElement('div');
 			utils.addClass(shade,'hclayer-shade');
 			var op = (typeof that.config.shade === 'number')?that.config.shade:0.3;
-			utils.css(shade,{'zIndex':that.config.zIndex-1, 'opacity':op});
+			utils.css(shade,{'zIndex':that.config.zIndex-1, 'opacity':op, background: that.config.background});
 			shade.setAttribute('id','hclayer-shade'+that.index);
 			document.body.appendChild(shade);
 			return '';
@@ -677,6 +696,9 @@ Layer.prototype._createMain = function() {
 	}
 	if(that.config.center) {
 		style += ' hc-is-center ';
+	}
+	if(that.config.type === 'load') {
+		utils.css(main, 'background', that.config.background);
 	}
 	utils.addClass(main, style);
 
@@ -786,7 +808,9 @@ Layer.prototype.listener = function(){
 	if(yes){
 		utils.addHandler(yes,'click',function(){
 			if(typeof that.config.yesCallback === 'function'){
-				that.config.yesCallback(that.index);
+				that.config.yesCallback(function(){
+					hclayer.close(that.index);	
+				});
 			}else{
 				hclayer.close(that.index);
 			}
@@ -797,7 +821,9 @@ Layer.prototype.listener = function(){
 	if(no){
 		utils.addHandler(no,'click',function(){
 			if(typeof that.config.noCallback === 'function'){
-				that.config.noCallback(that.index);
+				that.config.noCallback(function(){
+					hclayer.close(that.index);	
+				});
 			}else{
 				hclayer.close(that.index);
 			}

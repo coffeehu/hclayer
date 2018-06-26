@@ -247,8 +247,37 @@
 		opacity: 1;
 	}
 }
+/*渐隐隐藏*/
+.hclayer-anim-fadeOut{
+	-webkit-animation-name: layer-fadeOut;
+			animation-name: layer-fadeOut;
+}
+@keyframes layer-fadeOut{
+	0%{
+		opacity: 1;
+	}
+	100%{
+		opacity: 0;
+	}
+}
+@-webkit-keyframes layer-fadeOut{
+	0%{
+		opacity: 1;
+	}
+	100%{
+		opacity: 0;
+	}
+}
 /*关闭*/
-.hclayer-anim-close{
+.hclayer-anim-closeFade{
+	-webkit-animation-name: layer-fadeOut;
+			animation-name: layer-fadeOut;
+	-webkit-animation-duration:.3s;
+			animation-duration:.3s;
+	-webkit-animation-fill-mode: both;
+			animation-fill-mode: both;
+}
+.hclayer-anim-closeBounce{
 	-webkit-animation-name: layer-bounceOut;
 			animation-name: layer-bounceOut;
 	-webkit-animation-duration:.3s;

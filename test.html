@@ -121,7 +121,7 @@
 
       <div>
         <div id="loadingBlock3" style="background:pink;width:100%;height:200px;margin-bottom:20px"></div>
-        <button id="loading3">载入动画type=3</button>  
+        <button id="loading3">载入动画type=3,且设置背景</button>  
       </div>
 
       <div>
@@ -162,8 +162,9 @@
 	}
 	$('alert2').onclick = function(){
 		hclayer.alert({
-			content: '字段 titleBackground 可以设置标题栏的背景颜色',
-			title: 'title'
+			content: '</p>字段 titleBackground 设置标题栏的背景颜色</p> <p>background 设置遮罩层背景色</p>',
+			title: 'title',
+			background: '#fff'
 		});
 	}
 	$('alert3').onclick = function(){
@@ -177,12 +178,12 @@
 		hclayer.alert({
 			content: '字段 no 设置取消按钮',
 			no: '取消',
-			noCallback: function(index){
-				hclayer.close(index);
+			noCallback: function(done){
+				done();
 				hclayer.msg('已取消');
 			},
-			yesCallback: function(index){
-				hclayer.close(index);
+			yesCallback: function(done){
+				done();
 				hclayer.msg('确定');
 			},
 			title: '标题'
@@ -231,7 +232,8 @@
 		if(loadId3 === null) {
 			loadId3 = hclayer.load({
 				load: 3,
-				parent:'loadingBlock3'
+				parent:'loadingBlock3',
+				background: 'rgba(0,0,0,0.2)'
 			});
 		}else {
 			hclayer.close(loadId3);
