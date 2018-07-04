@@ -349,6 +349,7 @@ var utils = {
 */
 //utils.addcss();
 
+var msgList = [];
 
 var hclayer = window.hclayer = {
 	index:0,
@@ -371,7 +372,8 @@ var hclayer = window.hclayer = {
 			},content);
 		}
 		var o = new Layer(opt);
-		return o.index;
+		msgList.push(o);
+		return o;
 	},
 
 	alert:function(content){
@@ -400,7 +402,7 @@ var hclayer = window.hclayer = {
 			},content);
 		}
 		var o = new Layer(opt);
-		return o.index;
+		return o;
 	},
 
 	dialog: function(content) {
@@ -416,7 +418,7 @@ var hclayer = window.hclayer = {
 			})
 		}
 		var o = new Layer(opt);
-		return o.index;
+		return o;
 	},
 
 	/*
@@ -475,55 +477,18 @@ var hclayer = window.hclayer = {
 			background: background
 		}
 		var o = new Layer(option);
-		return o.index;
+		return o;
 	},
 
-	//根据index关闭弹窗
-	close:function(index){
-		var id = 'hclayer'+index;
-		var main = document.getElementById(id);
-		if(main){
-			//因为 load 和 alert/msg 的关闭动画不一样，所以要区分
-			if(utils.hasClass(main, 'hclayer-load-mask')) { 
-				utils.addClass(main,'hclayer-anim-closeFade');
-			} else {
-				utils.addClass(main,'hclayer-anim-closeBounce');
-			}
-			setTimeout(function(){
-				utils.remove(main);
-
-				// load()：移除父类添加的 is-relative 类
-				if(main._parent) {
-					utils.removeClass(main._parent, 'hclayer-is-relative');
-					main._parent = null;
-				}
-				if(main.shouldRmoveLock) { //表明该弹框弹出时做了 lock 操作，因此此时需要解除 lock
-					utils.removeClass(document.body, 'hclayer-is-lock');
-				}
-
-			},200);	
-		}
-
-		/*遮罩层*/
-		var sId = 'hclayer-shade'+index;
-		var shade = document.getElementById(sId);
-		if(shade){
-			setTimeout(function(){
-				utils.remove(shade);
-			},200);	
-		}
-	},
 	//关闭所有弹窗
 	closeAll:function(type){
-		var that = this;
-		var list = document.getElementsByClassName('hclayer-'+type);
-		for(var i=0,l=list.length;i<l;i++){
-			var index = list[i].getAttribute('hclayer-id');
-			that.close(index);
+		if(type === 'msg') {
+			for(var i=0,l=msgList.length; i<l; i++) {
+				msgList[i].close();
+			}
 		}
 	}
 }
-
 
 var config = {
 	shade:false, //遮罩层
@@ -569,7 +534,7 @@ Layer.prototype.create = function(){
 		return;
 	}
 
-	var main = that._createMain();
+	var main = that.main = that._createMain();
 	
 	/*
 		弹框的父元素默认为 body 元素。
@@ -618,7 +583,7 @@ Layer.prototype.create = function(){
 	// 自动关闭
 	if(that.config.time !== 0){
 		setTimeout(function(){
-			hclayer.close(that.index);
+			that.close();
 		}, this.config.time);	
 	}
 	
@@ -647,7 +612,7 @@ Layer.prototype._createMain = function() {
 		shade:function(){
 			if(!that.config.shade) return '';
 			if( document.getElementsByClassName('hclayer-shade')[0] ) return; //避免重复添加 shade
-			var shade = document.createElement('div');
+			var shade = that.shade = document.createElement('div');
 			utils.addClass(shade,'hclayer-shade');
 			var op = (typeof that.config.shade === 'number')?that.config.shade:0.3;
 			utils.css(shade,{'zIndex':that.config.zIndex-1, 'opacity':op, background: that.config.background});
@@ -713,7 +678,7 @@ Layer.prototype._createMain = function() {
 	}
 
 	//主体
-	var main = this.main = document.createElement('div');
+	var main = document.createElement('div');
 
 	//设置对应的 class
 	var style = that.config.skin + ' ';
@@ -838,7 +803,7 @@ Layer.prototype.listener = function(){
 	var close = that.main.getElementsByClassName('hclayer-close')[0];
 	if(close){
 		utils.addHandler(close,'click',function(){
-			hclayer.close(that.index);
+			that.close();
 			if(typeof close === 'function') that.config.close();
 		})
 	};
@@ -849,10 +814,10 @@ Layer.prototype.listener = function(){
 		utils.addHandler(yes,'click',function(){
 			if(typeof that.config.yesCallback === 'function'){
 				that.config.yesCallback(function(){
-					hclayer.close(that.index);	
+					that.close();	
 				});
 			}else{
-				hclayer.close(that.index);
+				that.close();
 			}
 		})
 	};
@@ -862,10 +827,10 @@ Layer.prototype.listener = function(){
 		utils.addHandler(no,'click',function(){
 			if(typeof that.config.noCallback === 'function'){
 				that.config.noCallback(function(){
-					hclayer.close(that.index);	
+					that.close();
 				});
 			}else{
-				hclayer.close(that.index);
+				that.close();
 			}
 		})
 	}
@@ -876,6 +841,7 @@ Layer.prototype.listener = function(){
 Layer.prototype.move = function(){
 	var that = this,
 		title = that.main.getElementsByClassName('hclayer-title')[0],
+		innerMain = that.main.getElementsByClassName('hclayer-dialog')[0], //考虑到如alert的情况，它的main是hclayer-alert-wrapper，而我们想要的是里面的hclayer-dialog
 		startMove = false,
 		offset;
 
@@ -886,18 +852,18 @@ Layer.prototype.move = function(){
 			e.preventDefault(); // 附赠功能：title的文字不会被选中
 
 			//------------设置 main 为 fixed 且居中位置------------
-			if( utils.css(that.main, 'position') !== 'fixed' ){
-				var area = [utils.outWidth(that.main),utils.outHeight(that.main)];
+			if( utils.css(innerMain, 'position') !== 'fixed' ){
+				var area = [utils.outWidth(innerMain),utils.outHeight(innerMain)];
 				var left = (utils.width(window) - area[0])/2,
 					top = (utils.height(window) - area[1])/2;
 
-				utils.css(that.main,{position:'fixed', left:left, top:top});
+				utils.css(innerMain, {position:'fixed', left:left, top:top});
 			}
 			//------------设置 END------------------
 
 			offset = [
-				e.clientX - parseFloat( utils.css(that.main,'left') ),
-				e.clientY - parseFloat( utils.css(that.main,'top') ),
+				e.clientX - parseFloat( utils.css(innerMain, 'left') ),
+				e.clientY - parseFloat( utils.css(innerMain, 'top') ),
 			]
 			startMove = true;
 		});
@@ -909,21 +875,64 @@ Layer.prototype.move = function(){
 				y = e.clientY - offset[1];
 
 			// 限制移动范围，不超过可视区域
-			var wh = utils.height(window)-utils.height(that.main);
-			var ww = utils.width(window)-utils.width(that.main);
+			var wh = utils.height(window)-utils.height(innerMain);
+			var ww = utils.width(window)-utils.width(innerMain);
 			x = x<0?0:x;
 			y = y<0?0:y;
 			x= x>ww?ww:x;
 			y= y>wh?wh:y;
 
-			utils.css(that.main, 'left', x);
-			utils.css(that.main, 'top', y);
+			utils.css(innerMain, 'left', x);
+			utils.css(innerMain, 'top', y);
 		}		
 	});
 
 	utils.addHandler(document,'mouseup',function(e){
 		startMove = false;
 	});
+}
+
+Layer.prototype.close = function() {
+	var main = this.main;
+	if(main){
+		//因为 load 和 alert/msg 的关闭动画不一样，所以要区分
+		if(utils.hasClass(main, 'hclayer-load-mask')) { 
+			utils.addClass(main,'hclayer-anim-closeFade');
+		} else {
+			utils.addClass(main,'hclayer-anim-closeBounce');
+		}
+		setTimeout(function(){
+			utils.remove(main);
+
+			// load()：移除父类添加的 is-relative 类
+			if(main._parent) {
+				utils.removeClass(main._parent, 'hclayer-is-relative');
+				main._parent = null;
+			}
+			if(main.shouldRmoveLock) { //表明该弹框弹出时做了 lock 操作，因此此时需要解除 lock
+				utils.removeClass(document.body, 'hclayer-is-lock');
+			}
+
+		},200);	
+	}
+
+	/*遮罩层*/
+	var shade = this.shade;
+	if(shade){
+		setTimeout(function(){
+			utils.remove(shade);
+		},200);	
+	}
+
+	//从 List 中移除
+	if(this.config.type === 'msg') {
+		for(var i=msgList.length-1; i>=0; i--) {
+			if(msgList[i].index === this.index) {
+				msgList.splice(i, 1);
+				break;
+			}
+		}
+	}
 }
 
 

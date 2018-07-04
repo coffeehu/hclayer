@@ -223,85 +223,85 @@
 
 	/*----------- loading 载入动画 ----------------*/
 	$('loading1').onclick = function() {
-		var loadId = hclayer.load();
+		var instance = hclayer.load();
 		setTimeout(function(){
-			hclayer.close(loadId);
+			instance.close();
 		}, 1500);
 	}
 	$('loading1-lock').onclick = function() {
-		var loadId = hclayer.load({
+		var instance = hclayer.load({
 			lock: true
 		});
 		setTimeout(function(){
-			hclayer.close(loadId);
+			instance.close();
 		}, 2000);	
 	}
 
-	var loadId2 = null;
+	var instance2 = null;
 	$('loading2').onclick = function() {
-		if(loadId2 === null) {
-			loadId2 = hclayer.load({
+		if(instance2 === null) {
+			instance2 = hclayer.load({
 				load:2,
 				parent:'loadingBlock2'
 			});
 		}else {
-			hclayer.close(loadId2);
-			loadId2 = null;
+			instance2.close();
+			instance2 = null;
 		}		
 	}
 
-	var loadId3 = null;
+	var instance3 = null;
 	$('loading3').onclick = function() {
-		if(loadId3 === null) {
-			loadId3 = hclayer.load({
+		if(instance3 === null) {
+			instance3 = hclayer.load({
 				load: 3,
 				parent:'loadingBlock3',
 				background: 'rgba(0,0,0,0.2)'
 			});
 		}else {
-			hclayer.close(loadId3);
-			loadId3 = null;
+			instance3.close();
+			instance3 = null;
 		}		
 	}
 
-	var loadId4 = null;
+	var instance4 = null;
 	$('loading4').onclick = function() {
-		if(loadId4 === null) {
-			loadId4 = hclayer.load({
+		if(instance4 === null) {
+			instance4 = hclayer.load({
 				load: 4,
 				parent:'loadingBlock4'
 			});
 		}else {
-			hclayer.close(loadId4);
-			loadId4 = null;
+			instance4.close();
+			instance4 = null;
 		}		
 	}
 
-	var loadId5 = null;
+	var instance5 = null;
 	$('loading5').onclick = function() {
-		if(loadId5 === null) {
-			loadId5 = hclayer.load({
+		if(instance5 === null) {
+			instance5 = hclayer.load({
 				loadText: 'loadText设置文本',
 				parent:'loadingBlock5',
 			});
 		}else {
-			hclayer.close(loadId5);
-			loadId5 = null;
+			instance5.close();
+			instance5 = null;
 		}		
 	}
 
-	var loadId6 = null;
+	var instance6 = null;
 	$('loading6').onclick = function() {
-		if(loadId6 === null) {
-			loadId6 = hclayer.load({
+		if(instance6 === null) {
+			instance6 = hclayer.load({
 				load: 4,
 				loadText: 'horizontal:true',
 				parent:'loadingBlock6',
 				horizontal: true
 			});
 		}else {
-			hclayer.close(loadId6);
-			loadId6 = null;
+			instance6.close(instance6);
+			instance6 = null;
 		}		
 	}	
 	
