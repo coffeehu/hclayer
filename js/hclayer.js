@@ -403,6 +403,22 @@ var hclayer = window.hclayer = {
 		return o.index;
 	},
 
+	dialog: function(content) {
+		var opt = null;
+		if(typeof content === 'string' || content instanceof HTMLElement) {
+			opt = utils.extend({}, {
+				type: 'dialog',
+				shade: true,
+				title: '',
+				close: true,
+				content: content,
+				btn: false
+			})
+		}
+		var o = new Layer(opt);
+		return o.index;
+	},
+
 	/*
 		opt为数字时，表示加载类型（字段load）：1-菊花转动；2-圆形旋转
 		opt为对象时，opt.parent 参数指明其父元素
@@ -526,6 +542,7 @@ var config = {
 	lock: false, //锁滚动条
 	center: false, //内容居中
 	//background: // 控制 alert、load 的背景颜色
+	skin: '', // 自定义 class
 };
 
 function Layer(opt){
@@ -577,6 +594,13 @@ Layer.prototype.create = function(){
 			main.shouldRmoveLock = true;
 		}
 		document.body.appendChild(main);
+	}
+
+	// content 为一个 DOM 元素的情况
+	if(that.config.content instanceof HTMLElement) {
+		var content = document.getElementById('hclayer--temp-content');
+		content.appendChild(that.config.content);
+		content.removeAttribute('id');
 	}
 
     /*
@@ -634,7 +658,7 @@ Layer.prototype._createMain = function() {
 		title:function(){
 			if(!that.config.title) {
 				if(that.config.type === 'alert'){ // alert: 当没有 title 时，也应该返回一个空白的填充元素，否则不美观。
-					return '<div style="height:20px"></div>';
+					return '<div class="hclayer-title" style="height:20px"></div>';
 				}else{
 					return '';
 				}
@@ -658,6 +682,15 @@ Layer.prototype._createMain = function() {
 		content:function(){
 			if(that.config.type === 'load') {  // 类型为 load 时
 				return that.config.content;
+			}
+			if(that.config.content instanceof HTMLElement) {
+				var display = utils.css(that.config.content, 'display');
+				that.config.content = that.config.content.cloneNode(true);
+				if(display === 'none') {
+					utils.css(that.config.content, 'display', 'block');	
+				}				
+
+				return '<div class="hclayer-content" id="hclayer--temp-content"></div>';	
 			}
 			return '<div class="hclayer-content">'+that.config.content+'</div>';
 		},
@@ -683,20 +716,27 @@ Layer.prototype._createMain = function() {
 	var main = this.main = document.createElement('div');
 
 	//设置对应的 class
-	var style = '';
+	var style = that.config.skin + ' ';
 	switch(that.config.type){
 		case 'msg': // msg
-			style = 'hclayer hclayer-dialog hclayer-msg hclayer-style-black';
+			style += 'hclayer hclayer-dialog hclayer-msg hclayer-style-black';
 			break;
-		case 'alert': // alert
-			style = 'hclayer hclayer-dialog hclayer-alert';
+		case 'alert': 
+			style += 'hclayer hclayer-dialog hclayer-alert';
+			break;
+		case 'dialog': 
+			style += 'hclayer hclayer-dialog hclayer-alert hclayer-dialog-custom';
 			break;
 		case 'load': // load
-			style = that.config.parent ? 'hclayer-load-mask' : 'hclayer-load-mask hclayer-is-full';
+			style += that.config.parent ? 'hclayer-load-mask' : 'hclayer-load-mask hclayer-is-full';
+			break;
 	}
+
+	//文字居中
 	if(that.config.center) {
 		style += ' hc-is-center ';
 	}
+
 	if(that.config.type === 'load') {
 		utils.css(main, 'background', that.config.background);
 	}
@@ -718,7 +758,7 @@ Layer.prototype._createMain = function() {
 	main.innerHTML = htmlContainer.join('');
 
 	// alert 需要加一个全屏的 wrapper，用于居中
-	if(that.config.type === 'alert') {
+	if(that.config.type === 'alert' || that.config.type === 'dialog') {
 		var _main = main;
 		main = document.createElement('div');
 		main.className = "hclayer-alert-wrapper";

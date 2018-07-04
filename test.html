@@ -106,6 +106,21 @@
       <button id="alert5">拖拽</button>
      </div>
 
+     <div class="module-wrapper root-module loading-module">
+     	<h1>dialog</h1>
+     	<button id="dialog1">自定义复杂的内容</button>
+     	<div id="dialog-content1" style="display: none;">
+     		<h1 style="width: 500px">a test</h1>
+     		<ul>
+     			<li>coffee</li>
+     			<li>tea</li>
+     			<li>milk</li>
+     			<li>pig</li>
+     			<li>shit</li>
+     		</ul>
+     	</div>
+     </div>
+
 	 <div class="module-wrapper root-module loading-module">
       <h1>loading</h1>
       <div>
@@ -191,12 +206,20 @@
 	}
 	$('alert5').onclick = function(){
 		hclayer.alert({
-			content: '有标题的时候，可通过 move 字段设置拖拽',
+			content: '<p>有标题的时候，可通过 move 字段设置拖拽</p><p>lock 字段设置隐藏滚动条</p>',
 			title: 'title',
 			move: true,
 			lock: true
 		});
 	}
+
+
+	/*----------- dialog 弹出层 ----------------*/
+	var content1 = $('dialog-content1');
+	$('dialog1').onclick = function() {
+		hclayer.dialog(content1);
+	}
+
 
 	/*----------- loading 载入动画 ----------------*/
 	$('loading1').onclick = function() {
