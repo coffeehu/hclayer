@@ -349,7 +349,8 @@ var utils = {
 */
 //utils.addcss();
 
-var msgList = [];
+var msgList = []; //存储 msg 的实例
+var noticeList = []; //存储 notice 的实例
 
 var hclayer = window.hclayer = {
 	index:0,
@@ -374,6 +375,30 @@ var hclayer = window.hclayer = {
 		var o = new Layer(opt);
 		msgList.push(o);
 		return o;
+	},
+
+	notice: function(content) {
+		var opt = null;
+		if(typeof content === 'string'){
+			opt = {
+				type: 'notice',
+				title: '',
+				close: true,
+				time: 3000,
+				content: content
+			}
+		}else if(typeof content === 'object'){
+			opt = utils.extend({},{
+				type: 'notice',
+				title: '',
+				close: true,
+				time: 3000,
+				content: content
+			}, content);
+		}
+		var o = new Layer(opt);
+		noticeList.push(o);
+		return o;		
 	},
 
 	alert:function(content){
@@ -483,8 +508,13 @@ var hclayer = window.hclayer = {
 	//关闭所有弹窗
 	closeAll:function(type){
 		if(type === 'msg') {
-			for(var i=0,l=msgList.length; i<l; i++) {
+			for(var i=msgList.length-1; i>=0; i--) {
 				msgList[i].close();
+			}
+		}
+		if(type === 'notice') {
+			for(var i=noticeList.length-1; i>=0; i--) {
+				noticeList[i].close();
 			}
 		}
 	}
@@ -507,6 +537,7 @@ var config = {
 	lock: false, //锁滚动条
 	center: false, //内容居中
 	//background: // 控制 alert、load 的背景颜色
+	position: 'top-right', // notice 的位置，top-right\top-left\bottom-right\bottom-left
 	skin: '', // 自定义 class
 };
 
@@ -561,11 +592,23 @@ Layer.prototype.create = function(){
 		document.body.appendChild(main);
 	}
 
-	// content 为一个 DOM 元素的情况
+	// dialog 的处理： content 为一个 DOM 元素的情况
 	if(that.config.content instanceof HTMLElement) {
 		var content = document.getElementById('hclayer--temp-content');
 		content.appendChild(that.config.content);
 		content.removeAttribute('id');
+	}
+
+	// notice 的处理: 当页面存在多个 notice 时，依次偏移
+	if(that.config.type === 'notice') {
+		var offsetTop = 16;
+		for(var i=0,l=noticeList.length; i<l; i++) {
+			var instance = noticeList[i];
+			if(instance.config.position !== that.config.position) continue;
+			offsetTop += instance.main.offsetHeight + 16;
+		}
+		var offsetName = that.config.position.indexOf('top-') > -1 ? 'top' : 'bottom';
+		utils.css(main, offsetName, offsetTop);
 	}
 
     /*
@@ -574,7 +617,7 @@ Layer.prototype.create = function(){
     	TDO:'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend'
     */
     utils.one(that.main,'animationend',function(){
-    	utils.removeClass(that.main,'hclayer-anim hclayer-anim-bounceIn');
+    	utils.removeClass(that.main,'hclayer-anim hclayer-anim-bounceIn hclayer-anim-fadeIn hclayer-anim-rightIn');
     })
 
 	//点击事件绑定
@@ -686,6 +729,9 @@ Layer.prototype._createMain = function() {
 		case 'msg': // msg
 			style += 'hclayer hclayer-dialog hclayer-msg hclayer-style-black';
 			break;
+		case 'notice':
+			style += 'hclayer hclayer-dialog hclayer-notice';
+			break;
 		case 'alert': 
 			style += 'hclayer hclayer-dialog hclayer-alert';
 			break;
@@ -702,15 +748,26 @@ Layer.prototype._createMain = function() {
 		style += ' hc-is-center ';
 	}
 
+	// load 的背景色。 而 alert 的背景色是应用在 shade 上的。
 	if(that.config.type === 'load') {
 		utils.css(main, 'background', that.config.background);
 	}
+
+	// notice 的动画
+	if(that.config.type === 'notice') {
+		if(that.config.position.indexOf('right') > -1) {
+			style += ' right hclayer-anim hclayer-anim-rightIn';
+		}else {
+			style += ' left hclayer-anim hclayer-anim-leftIn';
+		}
+	}
+
 	utils.addClass(main, style);
 
 	// 动画
 	if(that.config.type === 'load') {
 		utils.addClass(main, 'hclayer-anim hclayer-anim-fadeIn');
-	}else {
+	} else if(that.config.type === 'msg' || that.config.type === 'alert' || that.config.type === 'dialog'){
 		utils.addClass(main, 'hclayer-anim hclayer-anim-bounceIn');	
 	}
 
@@ -896,9 +953,9 @@ Layer.prototype.close = function() {
 	var main = this.main;
 	if(main){
 		//因为 load 和 alert/msg 的关闭动画不一样，所以要区分
-		if(utils.hasClass(main, 'hclayer-load-mask')) { 
+		if(this.config.type === 'load' || this.config.type === 'notice') { 
 			utils.addClass(main,'hclayer-anim-closeFade');
-		} else {
+		} else if(this.config.type === 'msg' || this.config.type === 'alert' || this.config.type === 'dialog') {
 			utils.addClass(main,'hclayer-anim-closeBounce');
 		}
 		setTimeout(function(){
@@ -932,7 +989,33 @@ Layer.prototype.close = function() {
 				break;
 			}
 		}
+	} 
+	else if(this.config.type === 'notice') {
+		var index = -1;
+		var instance = null;
+		for(var i=noticeList.length-1; i>=0; i--) {
+			if(noticeList[i].index === this.index) {
+				index = i;
+				instance = noticeList[i];
+				noticeList.splice(i, 1);
+				break;
+			}
+		}
+		if(!instance) return;
+		//设置 notice 的偏移
+		var offset = instance.main.offsetHeight + 16;
+		var offsetName = this.config.position.indexOf('top-') > -1 ? 'top' : 'bottom';
+		for(var i=index,l=noticeList.length; i<l; i++) {
+			if(instance.config.position !== noticeList[i].config.position) continue;
+			//var main = noticeList[i].main;  //注意，上面 setTimeout 中调用了 main，因此这个变量名不能写作 main，否则会冲突
+			var noticeMain = noticeList[i].main;
+
+			var originalOffset = parseInt( utils.css(noticeMain, offsetName) );
+			utils.css(noticeMain, offsetName, originalOffset - offset);
+		}
+
 	}
+
 }
 
 

@@ -94,8 +94,21 @@
 <div style="text-align: center;">
 
 	<div class="module-wrapper root-module loading-module">
-      <h1>message</h1>
+      <h1>msg</h1>
      </div>
+
+
+     <div class="module-wrapper root-module loading-module">
+      <h1>notice</h1>
+      <button id="notice1">默认（右上）</button>
+      <button id="notice2">左上</button>
+      <button id="notice3">右下</button>
+      <button id="notice4">左下</button>
+      <br>
+      <br>
+      <button id="noticex">关闭所有</button>
+     </div>
+
 
      <div class="module-wrapper root-module loading-module">
       <h1>alert</h1>
@@ -105,6 +118,7 @@
       <button id="alert4">按钮</button>
       <button id="alert5">拖拽</button>
      </div>
+
 
      <div class="module-wrapper root-module loading-module">
      	<h1>dialog</h1>
@@ -120,6 +134,7 @@
      		</ul>
      	</div>
      </div>
+
 
 	 <div class="module-wrapper root-module loading-module">
       <h1>loading</h1>
@@ -170,6 +185,32 @@
 		content: 'hehe',
 		time: 0
 	});*/
+
+	/*----------- alert 弹出框 ----------------*/
+	$('notice1').onclick = function() {
+		hclayer.notice('hehe');
+	}
+	$('notice2').onclick = function() {
+		hclayer.notice({
+			content: 'hehe',
+			position: 'top-left'
+		});
+	}
+	$('notice3').onclick = function() {
+		hclayer.notice({
+			content: 'hehe',
+			position: 'bottom-right'
+		});
+	}
+	$('notice4').onclick = function() {
+		hclayer.notice({
+			content: 'hehe',
+			position: 'bottom-left'
+		});
+	}
+	$('noticex').onclick = function() {
+		hclayer.closeAll('notice');
+	}
 
 	/*----------- alert 弹出框 ----------------*/
 	$('alert1').onclick = function(){
