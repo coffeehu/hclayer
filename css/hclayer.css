@@ -1,3 +1,19 @@
+@font-face {
+	font-family: "iconfont";
+	src: url('../fonts/iconfont.eot?t=1527125104122'); /* IE9*/
+	src: url('../fonts/iconfont.eot?t=1527125104122#iefix') format('embedded-opentype'), /* IE6-IE8 */
+	url('data:application/x-font-woff;charset=utf-8;base64,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') format('woff'),
+	url('../fonts/iconfont.ttf?t=1527125104122') format('truetype'), /* chrome, firefox, opera, Safari, Android, iOS 4.2+*/
+	url('../fonts/iconfont.svg?t=1527125104122#iconfont') format('svg'); /* iOS 4.1- */
+}
+.hclayer-clearfix:before,
+.hclayer-clearfix:after {
+	display: table;
+	content: '';
+} 
+.hclayer-clearfix:after {
+	clear: both;
+}
 .hc-is-center {
 	text-align: center!important;
 }
@@ -50,6 +66,48 @@
 	background: #000;
 	opacity: 0.3;
 }
+/*icon*/
+.hclayer-icon--info {
+  color: #909399!important;
+}
+.hclayer-icon--info:before {
+  content: "\e628";
+}
+.hclayer-icon--success {
+  color: #67c23a!important;
+}
+.hclayer-icon--success:before {
+  content: "\e625";
+}
+.hclayer-icon--help {
+  color: #b3b332!important;
+}
+.hclayer-icon--help:before {
+  content: "\e629";
+}
+.hclayer-icon--warn {
+  color: #e6a23c!important;
+}
+.hclayer-icon--warn:before {
+  content: "\e627";
+}
+.hclayer-icon--error {
+  color: #f56c6c!important;
+}
+.hclayer-icon--error:before {
+  content: "\e626";
+}
+.hclayer-icon--close:before {
+  content: "\e723";
+}
+[class*="hclayer-icon-"] {
+  font-family:"iconfont" !important;
+  font-size:16px;
+  font-style:normal;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-stroke-width: 0.2px;
+  -moz-osx-font-smoothing: grayscale;
+}
 /*标题*/
 .hclayer-title{
 	height: 42px;
@@ -91,6 +149,10 @@
 .hclayer-content{
 	padding: 20px;
 	font-size: 14px;
+}
+.hclayer-content * {
+	padding: 0;
+	margin: 0;
 }
 /*按钮*/
 .hclayer-btn{
@@ -153,10 +215,30 @@
 .hclayer-notice.left {
 	left: 16px;
 }
+.hclayer-dialog-icon.hclayer-notice .hclayer-title {
+	padding-left: 13px;
+}
+.hclayer-notice .hclayer-icon {
+	float: left;
+	font-size: 24px;
+}
+.hclayer-notice .hclayer-title {
+	font-weight: 700;
+	font-size: 18px;
+	height: auto;
+	line-height: inherit;
+}
 .hclayer-notice .hclayer-content {
 	padding: 0;
-	padding-left: 13px;
+	padding-left: 20px;
 	padding-top: 6px;
+}
+.hclayer-dialog-icon.hclayer-notice .hclayer-content {
+	padding-left: 38px;
+	padding-top: 4px;
+}
+.hclayer-notice .hclayer-close {
+	top: 4px;
 }
 .hclayer-notice .hclayer-close-2 {
 	top: 12px;

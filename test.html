@@ -101,6 +101,8 @@
      <div class="module-wrapper root-module loading-module">
       <h1>notice</h1>
       <button id="notice1">默认（右上）</button>
+      <button id="notice11">带图标</button>
+      <button id="notice12">带标题</button>
       <button id="notice2">左上</button>
       <button id="notice3">右下</button>
       <button id="notice4">左下</button>
@@ -186,25 +188,43 @@
 		time: 0
 	});*/
 
-	/*----------- alert 弹出框 ----------------*/
+	/*----------- notice ----------------*/
 	$('notice1').onclick = function() {
 		hclayer.notice('hehe');
+	}
+	$('notice11').onclick = function() {
+		hclayer.notice({
+			content: 'hehe',
+			icon: 'success'
+		});
+	}
+	$('notice12').onclick = function() {
+		hclayer.notice({
+			content: 'hehe',
+			title: 'title'
+		});
 	}
 	$('notice2').onclick = function() {
 		hclayer.notice({
 			content: 'hehe',
+			title: 'title',
+			icon: 'info',
 			position: 'top-left'
 		});
 	}
 	$('notice3').onclick = function() {
 		hclayer.notice({
 			content: 'hehe',
+			title: 'title',
+			icon: 'warn',
 			position: 'bottom-right'
 		});
 	}
 	$('notice4').onclick = function() {
 		hclayer.notice({
 			content: 'hehe',
+			title: 'title',
+			icon: 'error',
 			position: 'bottom-left'
 		});
 	}

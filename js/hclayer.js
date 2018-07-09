@@ -524,6 +524,7 @@ var config = {
 	shade:false, //遮罩层
 	title:false, //标题
 	//titleBackground: '#fff', //标题背景颜色
+	icon: false, // 开启图标: info/success/help/warn/error（暂时只有 notice 用到）
 	close:false, //关闭按钮
 	//content: //内容
 	btn:false, //底部按钮
@@ -540,6 +541,13 @@ var config = {
 	position: 'top-right', // notice 的位置，top-right\top-left\bottom-right\bottom-left
 	skin: '', // 自定义 class
 };
+var iconType = {
+	info: true,
+	success: true,
+	help: true,
+	warn: true,
+	error: true
+}
 
 function Layer(opt){
 	this.config = utils.extend({}, config, opt);
@@ -652,7 +660,7 @@ Layer.prototype._createMain = function() {
 		htmlContainer = [];
 
 	var views = {
-		shade:function(){
+		shade: function() {
 			if(!that.config.shade) return '';
 			if( document.getElementsByClassName('hclayer-shade')[0] ) return; //避免重复添加 shade
 			var shade = that.shade = document.createElement('div');
@@ -663,7 +671,14 @@ Layer.prototype._createMain = function() {
 			document.body.appendChild(shade);
 			return '';
 		},
-		title:function(){
+		icon: function() {
+			if(!that.config.icon) return '';
+			if(iconType[that.config.icon]) {
+				return '<div class="hclayer-icon hclayer-icon--'+that.config.icon+'"></div>';	
+			}
+			return '<div class="hclayer-icon hclayer-icon--success"></div>'
+		},
+		title: function() {
 			if(!that.config.title) {
 				if(that.config.type === 'alert'){ // alert: 当没有 title 时，也应该返回一个空白的填充元素，否则不美观。
 					return '<div class="hclayer-title" style="height:20px"></div>';
@@ -677,7 +692,7 @@ Layer.prototype._createMain = function() {
 			
 			return '<div class="hclayer-title">'+that.config.title+'</div>';
 		},
-		close:function(){
+		close: function() {
 			if(!that.config.close) return '';
 			var html = '';
 			if(that.config.title){
@@ -687,7 +702,7 @@ Layer.prototype._createMain = function() {
 			}
 			return html;
 		},
-		content:function(){
+		content: function() {
 			if(that.config.type === 'load') {  // 类型为 load 时
 				return that.config.content;
 			}
@@ -702,7 +717,7 @@ Layer.prototype._createMain = function() {
 			}
 			return '<div class="hclayer-content">'+that.config.content+'</div>';
 		},
-		btn:function(){
+		btn: function() {
 			if(!that.config.btn) return '';
 			var html = '<div class="hclayer-btn">';
 			if(that.config.no){
@@ -741,6 +756,11 @@ Layer.prototype._createMain = function() {
 		case 'load': // load
 			style += that.config.parent ? 'hclayer-load-mask' : 'hclayer-load-mask hclayer-is-full';
 			break;
+	}
+
+	// 是否有 icon
+	if(that.config.icon) {
+		style += ' hclayer-dialog-icon '
 	}
 
 	//文字居中
