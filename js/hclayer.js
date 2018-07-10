@@ -324,6 +324,29 @@ var utils = {
         link.id = id;
         head.appendChild(link);
     },
+    getScrollBarWidth: function() {
+    	var scrollBarWidth;
+		var outer = document.createElement('div');
+		outer.className = 'h-scrollbar--wrap';
+		outer.style.visibility = 'hidden';
+		outer.style.width = '100px';
+		outer.style.position = 'absolute';
+		outer.style.top = '-9999px';
+		document.body.appendChild(outer);
+
+		var widthNoScroll = outer.offsetWidth;
+		outer.style.overflow = 'scroll';
+
+		var inner = document.createElement('div');
+		inner.style.width = '100%';
+		outer.appendChild(inner);
+
+		var widthWithScroll = inner.offsetWidth;
+		outer.parentNode.removeChild(outer);
+		scrollBarWidth = widthNoScroll - widthWithScroll;
+
+		return scrollBarWidth;
+    },
     getPath:function(){
         // IE9下，document.currentScript 为 null
         var jsPath = document.currentScript ? document.currentScript.src : function(){
@@ -523,8 +546,7 @@ var hclayer = window.hclayer = {
 var config = {
 	shade:false, //遮罩层
 	title:false, //标题
-	//titleBackground: '#fff', //标题背景颜色
-	icon: false, // 开启图标: info/success/help/warn/error（暂时只有 notice 用到）
+	icon: false, // 开启图标: info/success/help/warn/error（todo: 暂时只有 notice、alert 用到）
 	close:false, //关闭按钮
 	//content: //内容
 	btn:false, //底部按钮
@@ -540,6 +562,7 @@ var config = {
 	//background: // 控制 alert、load 的背景颜色
 	position: 'top-right', // notice 的位置，top-right\top-left\bottom-right\bottom-left
 	skin: '', // 自定义 class
+	closeOnClickShade: false, // 点击遮罩层是否关闭弹框（目前仅应用到 alert）
 };
 var iconType = {
 	info: true,
@@ -574,6 +597,15 @@ Layer.prototype.create = function(){
 	}
 
 	var main = that.main = that._createMain();
+
+	//点击遮罩层关闭
+	if( (that.config.type === 'alert' || that.config.type === 'dialog') && that.config.closeOnClickShade) {
+		main.onclick = function(e) {
+			if(main === e.target) {
+				that.close();
+			}
+		}
+	}
 	
 	/*
 		弹框的父元素默认为 body 元素。
@@ -590,12 +622,14 @@ Layer.prototype.create = function(){
 		main._parent = p;
 	}else{
 		if(that.config.lock) {
-			utils.addClass(document.body, 'hclayer-is-lock'); 
+			utils.addClass(document.body, 'hclayer-is-lock');
+			that.paddingRight = utils.css(document.body, 'paddingRight');
+			utils.css(document.body, 'paddingRight', utils.getScrollBarWidth());
 			/* 
 				添加一个标识，表示对于这个弹窗，关闭时需要执行解除 lock 操作；
 				若不这样做的话，所有的 close() 关闭弹框调用都会执行解除 lock 操作，造成不需要的影响
 			*/
-			main.shouldRmoveLock = true;
+			that.shouldRmoveLock = true;
 		}
 		document.body.appendChild(main);
 	}
@@ -664,7 +698,7 @@ Layer.prototype._createMain = function() {
 			if(!that.config.shade) return '';
 			if( document.getElementsByClassName('hclayer-shade')[0] ) return; //避免重复添加 shade
 			var shade = that.shade = document.createElement('div');
-			utils.addClass(shade,'hclayer-shade');
+			utils.addClass(shade,'hclayer-shade hclayer-anim hclayer-anim-fadeIn');
 			var op = (typeof that.config.shade === 'number')?that.config.shade:0.3;
 			utils.css(shade,{'zIndex':that.config.zIndex-1, 'opacity':op, background: that.config.background});
 			shade.setAttribute('id','hclayer-shade'+that.index);
@@ -673,21 +707,27 @@ Layer.prototype._createMain = function() {
 		},
 		icon: function() {
 			if(!that.config.icon) return '';
+			if(that.config.type !== 'notice') return '';  //todo：暂时只有 notice、alert 有这功能
 			if(iconType[that.config.icon]) {
 				return '<div class="hclayer-icon hclayer-icon--'+that.config.icon+'"></div>';	
 			}
-			return '<div class="hclayer-icon hclayer-icon--success"></div>'
+			return '<div class="hclayer-icon '+that.config.icon+'"></div>'
 		},
 		title: function() {
 			if(!that.config.title) {
 				if(that.config.type === 'alert'){ // alert: 当没有 title 时，也应该返回一个空白的填充元素，否则不美观。
-					return '<div class="hclayer-title" style="height:20px"></div>';
+					return '<div class="hclayer-title" style="height:20px;padding:0"></div>';
 				}else{
 					return '';
 				}
 			}
-			if(that.config.titleBackground) {
-				return '<div class="hclayer-title" style="background:'+that.config.titleBackground+'">'+that.config.title+'</div>';
+
+			// 居中的时候，alert 的 icon 是设置在 title 上的。
+			if(that.config.type === 'alert' && that.config.icon && that.config.center) {
+				if(iconType[that.config.icon]) {
+					return '<div class="hclayer-title"><div class="hclayer-icon hclayer-icon--'+that.config.icon+'"></div><div class="hclayer-title--inner">'+that.config.title+'</div></div>';
+				}
+				return '<div class="hclayer-title"><div class="hclayer-icon '+that.config.icon+'"></div><div class="hclayer-title--inner">'+that.config.title+'</div></div>';
 			}
 			
 			return '<div class="hclayer-title">'+that.config.title+'</div>';
@@ -712,8 +752,15 @@ Layer.prototype._createMain = function() {
 				if(display === 'none') {
 					utils.css(that.config.content, 'display', 'block');	
 				}				
-
 				return '<div class="hclayer-content" id="hclayer--temp-content"></div>';	
+			}
+			// alert 的 icon 在 content 中设置
+			// 注意，alert 居中的时候，icon 是设置在 title 上的
+			if(that.config.type === 'alert' && that.config.icon && !that.config.center) {
+				if(iconType[that.config.icon]) {
+					return '<div class="hclayer-content"><div class="hclayer-icon hclayer-icon--'+that.config.icon+'"></div><div class="hclayer-content--inner">'+that.config.content+'</div></div>';	
+				}
+				return '<div class="hclayer-content"><div class="'+that.config.icon+'"></div><div class="hclayer-content--inner">'+that.config.content+'</div></div>';
 			}
 			return '<div class="hclayer-content">'+that.config.content+'</div>';
 		},
@@ -970,12 +1017,13 @@ Layer.prototype.move = function(){
 }
 
 Layer.prototype.close = function() {
-	var main = this.main;
+	var that = this;
+	var main = that.main;
 	if(main){
 		//因为 load 和 alert/msg 的关闭动画不一样，所以要区分
-		if(this.config.type === 'load' || this.config.type === 'notice') { 
+		if(that.config.type === 'load' || that.config.type === 'notice') { 
 			utils.addClass(main,'hclayer-anim-closeFade');
-		} else if(this.config.type === 'msg' || this.config.type === 'alert' || this.config.type === 'dialog') {
+		} else if(that.config.type === 'msg' || that.config.type === 'alert' || that.config.type === 'dialog') {
 			utils.addClass(main,'hclayer-anim-closeBounce');
 		}
 		setTimeout(function(){
@@ -986,7 +1034,11 @@ Layer.prototype.close = function() {
 				utils.removeClass(main._parent, 'hclayer-is-relative');
 				main._parent = null;
 			}
-			if(main.shouldRmoveLock) { //表明该弹框弹出时做了 lock 操作，因此此时需要解除 lock
+			if(that.shouldRmoveLock) { //表明该弹框弹出时做了 lock 操作，因此此时需要解除 lock
+				/*setTimeout(() => {
+					
+				}, 300)*/
+				utils.css(document.body, {'paddingRight': that.paddingRight});
 				utils.removeClass(document.body, 'hclayer-is-lock');
 			}
 
@@ -996,6 +1048,7 @@ Layer.prototype.close = function() {
 	/*遮罩层*/
 	var shade = this.shade;
 	if(shade){
+		utils.addClass(shade, 'hclayer-anim-closeFade');
 		setTimeout(function(){
 			utils.remove(shade);
 		},200);	

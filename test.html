@@ -115,10 +115,16 @@
      <div class="module-wrapper root-module loading-module">
       <h1>alert</h1>
       <button id="alert1">默认</button>
+      <button id="alert11">图标</button>
       <button id="alert2">标题</button>
+      <br>
+      <br>
       <button id="alert3">文本居中</button>
+      <button id="alert31">文本居中带图标</button>
+      <br>
+      <br>
       <button id="alert4">按钮</button>
-      <button id="alert5">拖拽</button>
+      <button id="alert5">拖拽和锁滚动条</button>
      </div>
 
 
@@ -236,23 +242,40 @@
 	$('alert1').onclick = function(){
 		hclayer.alert('hello');
 	}
+	$('alert11').onclick = function(){
+		hclayer.alert({
+			content: 'hello',
+			icon: 'success',
+			closeOnClickShade: true
+		});
+	}
 	$('alert2').onclick = function(){
 		hclayer.alert({
 			content: '</p>字段 titleBackground 设置标题栏的背景颜色</p> <p>background 设置遮罩层背景色</p>',
 			title: 'title',
-			background: '#fff'
+			background: '#fff',
+			closeOnClickShade: true
 		});
 	}
 	$('alert3').onclick = function(){
 		hclayer.alert({
 			content: '文本可以居中',
 			title: 'title',
+			center: true
+		});
+	}
+	$('alert31').onclick = function(){
+		hclayer.alert({
+			content: '文本居中带图标',
+			title: 'title',
 			center: true,
+			icon: 'success'
 		});
 	}
 	$('alert4').onclick = function(){
 		hclayer.alert({
 			content: '字段 no 设置取消按钮',
+			icon: 'warn',
 			no: '取消',
 			noCallback: function(done){
 				done();

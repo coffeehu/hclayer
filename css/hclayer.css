@@ -267,6 +267,27 @@
 	vertical-align: middle;
 	text-align: left;
 }
+.hclayer-alert .hclayer-icon,
+.hclayer-title--inner,
+.hclayer-content--inner {
+	display: inline-block;
+	vertical-align: middle;
+}
+.hclayer-alert .hclayer-icon {
+	font-size: 24px;
+	margin-right: 6px;
+}
+.hclayer-alert .hclayer-title {
+	height: auto;
+	line-height: inherit;
+	padding-top: 15px;
+	padding-bottom: 5px;
+}
+.hclayer-alert.hc-is-center .hclayer-title {
+	padding-top: 25px;
+	padding-bottom: 0px;
+}
+/*.hclayer-dialog-icon.hclayer-alert */
 /*-------------------load加载---------------*/
 .hclayer-load{
 	box-shadow: none;
@@ -348,17 +369,17 @@
 	0%{
 		opacity: 0;
 	}
-	100%{
+	/*100%{
 		opacity: 1;
-	}
+	}*/
 }
 @-webkit-keyframes layer-fadeIn{
 	0%{
 		opacity: 0;
 	}
-	100%{
+	/*100%{
 		opacity: 1;
-	}
+	}*/
 }
 /*渐隐隐藏*/
 .hclayer-anim-fadeOut{
@@ -366,17 +387,17 @@
 			animation-name: layer-fadeOut;
 }
 @keyframes layer-fadeOut{
-	0%{
+	/*0%{
 		opacity: 1;
-	}
+	}*/
 	100%{
 		opacity: 0;
 	}
 }
 @-webkit-keyframes layer-fadeOut{
-	0%{
+	/*0%{
 		opacity: 1;
-	}
+	}*/
 	100%{
 		opacity: 0;
 	}
