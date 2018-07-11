@@ -14,6 +14,12 @@
 .hclayer-clearfix:after {
 	clear: both;
 }
+.hc-is-hide {
+	display: none!important;
+}
+.hc-is-show {
+	display: block!important;
+}
 .hc-is-center {
 	text-align: center!important;
 }
@@ -287,7 +293,6 @@
 	padding-top: 25px;
 	padding-bottom: 0px;
 }
-/*.hclayer-dialog-icon.hclayer-alert */
 /*-------------------load加载---------------*/
 .hclayer-load{
 	box-shadow: none;
@@ -327,6 +332,63 @@
 .hc-is-inlineblock.hclayer-load-text {
 	margin-top: 0;
 	margin-left: 5px;
+}
+/*------------------- tips ---------------*/
+.hclayer-tips {
+  position: absolute;
+  z-index: 2000;
+  padding: 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 1.2;
+  background: #303133;
+  color: #fff;
+}
+.hclayer-tips--arrow {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border: 6px solid transparent;
+}
+.hclayer-tips[x-placement^=top] {
+  margin-bottom: 10px;
+}
+.hclayer-tips[x-placement^=top] .hclayer-tips--arrow {
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-top-color: #303133;
+  border-bottom-width: 0;
+}
+.hclayer-tips[x-placement^=bottom] {
+  margin-top: 10px;
+}
+.hclayer-tips[x-placement^=bottom] .hclayer-tips--arrow {
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-bottom-color: #303133;
+  border-top-width: 0;
+}
+.hclayer-tips[x-placement^=left] {
+  margin-right: 10px;
+}
+.hclayer-tips[x-placement^=left] .hclayer-tips--arrow {
+  top: 50%;
+  right: -6px;
+  transform: translateY(-50%);
+  border-left-color: #303133;
+  border-right-width: 0;
+}
+.hclayer-tips[x-placement^=right] {
+  margin-left: 10px;
+}
+.hclayer-tips[x-placement^=right] .hclayer-tips--arrow {
+  top: 50%;
+  left: -6px;
+  transform: translateY(-50%);
+  border-right-color: #303133;
+  border-left-width: 0;
 }
 /*---------动画----------*/
 .hclayer-anim{

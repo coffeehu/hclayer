@@ -144,6 +144,15 @@
      </div>
 
 
+    <div class="module-wrapper root-module loading-module">
+     	<h1>tips</h1>
+     	<button id="tiptest">tiptest</button>
+     	<button id="tip-bottom">tiptest</button>
+     	<button id="tip-left">tiptest</button>
+     	<button id="tip-right">tiptest</button>
+    </div>
+
+
 	 <div class="module-wrapper root-module loading-module">
       <h1>loading</h1>
       <div>
@@ -178,6 +187,7 @@
       </div>
 
     </div>
+
 
 </div>
 	
@@ -389,8 +399,22 @@
 		}		
 	}	
 	
-	
-
+	hclayer.tips('hehe', 'tiptest');
+	hclayer.tips({
+		content: 'hehe',
+		id: 'tip-bottom',
+		placement: 'bottom'
+	});
+	hclayer.tips({
+		content: 'hehe',
+		id: 'tip-right',
+		placement: 'right'
+	});
+	hclayer.tips({
+		content: 'hehe',
+		id: 'tip-left',
+		placement: 'left'
+	});
 
 
 </script>

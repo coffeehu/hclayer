@@ -10,71 +10,39 @@ var utils = {
 		if(this.isWindow(el)){
 			return window.document.documentElement.clientWidth;
 		}
-		//可见
-		if(true){
-			return this.getWidthOrHeight(el,'width','content');
-		}
-		//不可见
-		else{
-
-		}
+		return this.getWidthOrHeight(el,'width','content');
 	},
 	inWidth:function(el){
-		//可见
-		if(true){
-			return this.getWidthOrHeight(el,'width','padding');
-		}
-		//不可见
-		else{
-
-		}
+		return this.getWidthOrHeight(el,'width','padding');
 	},
 	outWidth:function(el,margin){
 		var extra = margin?'margin':'border';
-		//可见
-		if(true){
-			return this.getWidthOrHeight(el,'width',extra);
-		}
-		//不可见
-		else{
-
-		}
+		return this.getWidthOrHeight(el,'width',extra);
 	},
 	height:function(el){
 		if(this.isWindow(el)){
 			return window.document.documentElement.clientHeight;
 		}
-		//可见
-		if(true){
-			return this.getWidthOrHeight(el,'height','content');
-		}
-		//不可见
-		else{
-
-		}
+		return this.getWidthOrHeight(el,'height','content');
 	},
 	inHeight:function(el){
-		//可见
-		if(true){
-			return this.getWidthOrHeight(el,'height','padding');
-		}
-		//不可见
-		else{
-
-		}
+		return this.getWidthOrHeight(el,'height','padding');
 	},
 	outHeight:function(el,margin){
 		var extra = margin?'margin':'border';
-		//可见
-		if(true){
-			return this.getWidthOrHeight(el,'height',extra);
-		}
-		//不可见
-		else{
-
-		}
+		return this.getWidthOrHeight(el,'height',extra);
 	},
 	getWidthOrHeight:function(el,type,extra){
+		var isHide = false;
+		var _display, _visibility;
+		if(el.style.display === 'none') { //不可见
+			isHide = true;
+			_display = el.style.display, 
+			_visibility = el.style.visibility;
+			el.style.display = 'block';
+			el.style.visibility = 'hidden';
+		}
+
 		var styles = this.getStyle(el),
 			val = this.curCSS(el,type,styles),
 			isBorderBox = this.curCSS(el,'boxSizing',styles) === 'border-box';
@@ -85,7 +53,14 @@ var utils = {
 
 		val = parseFloat(val)||0;
 		
-		return ( val + this.argumentWidthOrHeight(el,type,extra,isBorderBox,styles) );
+		var finalVal = ( val + this.argumentWidthOrHeight(el,type,extra,isBorderBox,styles) );
+
+		if(isHide){
+			el.style.display = _display;
+			el.style.visibility = _visibility;
+		}
+
+		return finalVal;
 	},
 	getStyle:function(el){
 		var view = el.ownerDocument.defaultView;
@@ -365,6 +340,181 @@ var utils = {
     }
 };
 
+//-------------------------- tips -------------------
+function getRelativeBoundingClientRect(reference, position) {
+	var parentRect = getBoundingClientRect(document.documentElement);
+	var referenceRect = getBoundingClientRect(reference);
+
+	if(position === 'fixed') {
+		return referenceRect;
+	}
+
+	return {
+		top: referenceRect.top - parentRect.top,
+		bottom: referenceRect.top - parentRect.top + referenceRect.height,
+        left: referenceRect.left - parentRect.left,
+        right: referenceRect.left - parentRect.left + referenceRect.width,
+        width: referenceRect.width,
+        height: referenceRect.height
+    };
+}
+// TODO
+function getBoundingClientRect(element) {
+    var rect = element.getBoundingClientRect();
+
+    var isIE = navigator.userAgent.indexOf("MSIE") != -1;
+
+    var rectTop = isIE && element.tagName === 'HTML'
+        ? -element.scrollTop
+        : rect.top;
+
+    return {
+        left: rect.left,
+        top: rectTop,
+        right: rect.right,
+        bottom: rect.bottom,
+        width: rect.right - rect.left,
+        height: rect.bottom - rectTop
+    };
+}
+function createPopper(content) {
+	var popper = document.createElement('span');
+	popper.innerHTML = content;
+	utils.addClass(popper, 'hclayer-tips');
+	document.body.appendChild(popper);
+	return popper;
+}
+function addArrow(popper) {
+	const arrow = document.createElement('div');
+	arrow.className = 'hclayer-tips--arrow';
+	popper.appendChild(arrow);
+}
+function handlerListener(reference, popper, type) {
+	if(type === 'hover') {
+		var timeId = null;
+		popper.isEnterPopper = false;
+		utils.addHandler(reference, 'mouseenter', function() {
+			if(timeId !== null) clearTimeout(timeId);
+			showTips(popper);
+		});
+		utils.addHandler(reference, 'mouseleave', function() {
+			timeId = closeTips(popper);
+		});
+		utils.addHandler(popper, 'mouseenter', function() {
+			popper.isEnterPopper = true;
+		});
+		utils.addHandler(popper, 'mouseleave', function() {
+			popper.isEnterPopper = false;
+			timeId = closeTips(popper);
+		});
+	}else if(type === 'click') {
+		utils.addHandler(reference, 'click', function() {
+
+		});
+	}
+}
+function closeTips(popper, isEnterPopper) {
+	return setTimeout(function() {
+		if(popper.isEnterPopper) return;
+		utils.removeClass(popper, 'hc-is-show');
+		utils.addClass(popper, 'hc-is-hide');
+	}, 200);
+}
+function showTips(popper) {
+	utils.removeClass(popper, 'hc-is-hide');
+	utils.addClass(popper, 'hc-is-show');
+}
+var DEFAULT = {
+	placement: 'top',
+	modifiers: [ 'applyStyle' ],
+}
+function Popper(reference, popper, options){
+	this._reference = reference;
+	this._popper = popper;
+	this._options = utils.extend({}, DEFAULT, options);
+	this._options.modifiers = this._options.modifiers.map(function(modifier){
+		return this.modifiers[modifier] || modifier;
+	}.bind(this));
+	this._popper.setAttribute('x-placement', this._options.placement);
+	this.position = this._getPosition(reference);
+	this.update();
+	return this;
+}
+
+Popper.prototype._getPosition = function(reference){
+	var isFixed = this._isFixed(reference);
+	return isFixed ? 'fixed' : 'absolute';
+}
+Popper.prototype._isFixed = function(el){
+	if(el === document.body){
+		return false;
+	}
+	if( utils.css(el,'position') === 'fixed' ){
+		return true;
+	}
+	return el.parentNode ? this._isFixed(el.parentNode) : el;
+}
+Popper.prototype.update = function(){
+	var data = { instance: this };
+	data.placement = this._options.placement;
+	data.offsets = this._getOffsets(this._popper, this._reference, data.placement);
+
+	this.modifiers.applyStyle.call(this,data);
+}
+/*
+	placement: 暂时只有 top/bottom/left/right,
+	以后会增加为 top/top-start/top-end/
+			   bottom/bottom-start/bottom-end/
+			   left/left-start/left-end/
+			   right/right-start/right-end
+*/
+Popper.prototype._getOffsets = function(popper, reference, placement){
+	var referenceOffsets = getRelativeBoundingClientRect(reference, this.position);
+	var popperOffsets = {};
+	popperOffsets.width = utils.outWidth(popper, true);
+	popperOffsets.height = utils.outHeight(popper, true);
+	
+	placement = placement.split('-')[0];
+	if(placement === 'right' || placement === 'left') {
+		popperOffsets.top = referenceOffsets.top + referenceOffsets.height/2 - popperOffsets.height/2;
+		if(placement === 'right'){
+			popperOffsets.left = referenceOffsets.right;
+		}else {
+			popperOffsets.left = referenceOffsets.left - popperOffsets.width;
+		}
+	}else {
+		popperOffsets.left = referenceOffsets.left + referenceOffsets.width/2 - popperOffsets.width/2;
+		if(placement === 'top'){
+			popperOffsets.top = referenceOffsets.top - popperOffsets.height;
+		}else {
+			popperOffsets.top = referenceOffsets.bottom;
+		}
+	}
+
+	return {
+        popper: popperOffsets,
+        reference: referenceOffsets
+    };
+}
+Popper.prototype.destroy = function(){
+	console.log('destroy');
+}
+Popper.prototype.modifiers = {
+	applyStyle: function(data){
+		var styles = {
+            position: this.position
+        };
+
+        // round top and left to avoid blurry text
+        var left = Math.round(data.offsets.popper.left);
+        var top = Math.round(data.offsets.popper.top);
+		styles.left =left;
+		styles.top = top;
+		utils.css(this._popper, styles);
+	}
+}
+//------------------ tips end -----------------------------
+
 /*
 	TODO:
 	开启自动载入 css 后，若 html 页面只有 loading 模块（页面长度比较短？），弹出 msg 无异常；
@@ -528,8 +678,34 @@ var hclayer = window.hclayer = {
 		return o;
 	},
 
+	tips: function(content, id) {
+		var mId = null;
+		var mContent = '';
+		var placement = 'top';
+		var type = 'hover';  // hover/click
+		if(typeof content === 'string' && id) {
+			mContent = content;
+			mId = id;			
+		}else if(typeof content === 'object') {
+			if(!content.id) throw new Error('you must specify the "id"!');
+			mContent = content.content;
+			mId = content.id;
+			placement = content.placement || 'top';
+			type = content.type || 'hover';
+		}
+		
+		var reference = document.getElementById(mId);
+		var popper = createPopper(mContent);
+		addArrow(popper);
+		handlerListener(reference, popper, type);
+
+		new Popper(reference, popper, { placement: placement });
+
+		utils.addClass(popper, 'hc-is-hide');
+	},
+
 	//关闭所有弹窗
-	closeAll:function(type){
+	closeAll: function(type){
 		if(type === 'msg') {
 			for(var i=msgList.length-1; i>=0; i--) {
 				msgList[i].close();
@@ -563,6 +739,7 @@ var config = {
 	position: 'top-right', // notice 的位置，top-right\top-left\bottom-right\bottom-left
 	skin: '', // 自定义 class
 	closeOnClickShade: false, // 点击遮罩层是否关闭弹框（目前仅应用到 alert）
+	//el: 'test',  // 用于 tips, 指定应用的元素
 };
 var iconType = {
 	info: true,
