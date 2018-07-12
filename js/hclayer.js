@@ -385,7 +385,7 @@ function createPopper(content) {
 	return popper;
 }
 function addArrow(popper) {
-	const arrow = document.createElement('div');
+	var arrow = document.createElement('div');
 	arrow.className = 'hclayer-tips--arrow';
 	popper.appendChild(arrow);
 }
