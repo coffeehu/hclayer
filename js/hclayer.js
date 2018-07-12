@@ -408,21 +408,29 @@ function handlerListener(reference, popper, type) {
 			timeId = closeTips(popper);
 		});
 	}else if(type === 'click') {
+		var isShow = false;
 		utils.addHandler(reference, 'click', function() {
-
+			if(isShow) {
+				closeTips(popper);
+			}else {
+				showTips(popper);
+			}
+			isShow = !isShow;
 		});
 	}
 }
 function closeTips(popper, isEnterPopper) {
 	return setTimeout(function() {
 		if(popper.isEnterPopper) return;
-		utils.removeClass(popper, 'hc-is-show');
-		utils.addClass(popper, 'hc-is-hide');
+		/*utils.removeClass(popper, 'hc-is-show');
+		utils.addClass(popper, 'hc-is-hide');*/
+		utils.css(popper, 'display', 'none');
 	}, 200);
 }
 function showTips(popper) {
-	utils.removeClass(popper, 'hc-is-hide');
-	utils.addClass(popper, 'hc-is-show');
+	/*utils.removeClass(popper, 'hc-is-hide');
+	utils.addClass(popper, 'hc-is-show');*/
+	utils.css(popper, 'display', 'block');
 }
 var DEFAULT = {
 	placement: 'top',
@@ -524,6 +532,7 @@ Popper.prototype.modifiers = {
 
 var msgList = []; //存储 msg 的实例
 var noticeList = []; //存储 notice 的实例
+var tipsList = [];
 
 var hclayer = window.hclayer = {
 	index:0,
@@ -698,10 +707,19 @@ var hclayer = window.hclayer = {
 		var popper = createPopper(mContent);
 		addArrow(popper);
 		handlerListener(reference, popper, type);
+		utils.css(popper, 'display', 'none');
 
-		new Popper(reference, popper, { placement: placement });
+		var o = new Popper(reference, popper, { placement: placement });
 
-		utils.addClass(popper, 'hc-is-hide');
+		tipsList.push(o);
+
+		if(tipsList.length === 1) {
+			window.onresize = function() {
+				for(var i=0,l=tipsList.length; i<l; i++) {
+					tipsList[i].update();
+				}
+			}
+		}
 	},
 
 	//关闭所有弹窗

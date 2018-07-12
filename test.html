@@ -2,9 +2,18 @@
 <html>
 <head>
 	<title></title>
+	<meta charset="utf-8">
 	<link rel="stylesheet" type="text/css" href="css/hclayer.css">
 	<script src="js/hclayer.js"></script>
 	<style type="text/css">
+		.clearfix:before,
+		.clearfix:after {
+			content: " ";
+			display: table;
+		}
+		.clearfix:after {
+			clear: both;
+		}
 		#test{
 			background: red;
 			position: static;
@@ -146,10 +155,14 @@
 
     <div class="module-wrapper root-module loading-module">
      	<h1>tips</h1>
-     	<button id="tiptest">tiptest</button>
-     	<button id="tip-bottom">tiptest</button>
-     	<button id="tip-left">tiptest</button>
-     	<button id="tip-right">tiptest</button>
+     	<div style="width: 250px">
+	     	<div style="margin-bottom: 20px;"><button id="tip-top">top(默认)</button></div>
+	     	<div class="clearfix" style="min-width: 150px">
+		     	<button id="tip-left" style="float:left;">left</button>
+		     	<button id="tip-right" style="float:right;">right</button>
+		     </div>
+	     	<div  style="margin-top: 20px"><button id="tip-bottom">bottom</button></div>
+     	</div>
     </div>
 
 
@@ -399,7 +412,7 @@
 		}		
 	}	
 	
-	hclayer.tips('hehe', 'tiptest');
+	hclayer.tips('hehe', 'tip-top');
 	hclayer.tips({
 		content: 'hehe',
 		id: 'tip-bottom',
