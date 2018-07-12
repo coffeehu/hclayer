@@ -201,6 +201,17 @@
 	padding: 15px;
 	font-size: 16px;
 }
+.hclayer-msg.hclayer-dialog-icon .hclayer-icon,
+.hclayer-msg.hclayer-dialog-icon .hclayer-content {
+	display: inline-block;
+	vertical-align: middle;
+}
+.hclayer-msg.hclayer-dialog-icon .hclayer-icon {
+	font-size: 24px;
+}
+.hclayer-msg .hclayer-close {
+	top: 8px;
+}
 /*-------------------notice---------------*/
 .hclayer-notice {
 	position: fixed;
@@ -464,6 +475,40 @@
 		opacity: 0;
 	}
 }
+/*顶部下滑出*/
+.hclayer-anim-topIn {
+	-webkit-animation-name: layer-topIn;
+		animation-name: layer-topIn;
+}
+@-webkit-keyframes layer-topIn {
+	0% {
+		top: 0;
+		opacity: 0;
+	}
+}
+@keyframes layer-topIn {
+	0% {
+		top: 0;
+		opacity: 0;
+	}
+}
+/*底部上滑出*/
+.hclayer-anim-bottomIn {
+	-webkit-animation-name: layer-bottomIn;
+		animation-name: layer-bottomIn;
+}
+@-webkit-keyframes layer-bottomIn {
+	0% {
+		bottom: 0;
+		opacity: 0;
+	}
+}
+@keyframes layer-bottomIn {
+	0% {
+		bottom: 0;
+		opacity: 0;
+	}
+}
 /*右侧滑出*/
 .hclayer-anim-rightIn {
 	-webkit-animation-name: layer-rightIn;
@@ -541,6 +586,56 @@
 	100%{
 		opacity: 0;
 		transform: scale(.7);
+	}
+}
+/*顶部上滑关闭*/
+.hclayer-anim-topOut {
+	-webkit-animation-name: layer-topOut;
+		animation-name: layer-topOut;
+			-webkit-animation-duration:.3s;
+			animation-duration:.3s;
+	-webkit-animation-fill-mode: both;
+			animation-fill-mode: both;
+}
+@-webkit-keyframes layer-topOut {
+	100% {
+		opacity: 0;
+		top: 0;
+		-webkit-transform: translateY(-100%);
+  		transform: translateY(-100%);
+	}
+}
+@keyframes layer-topOut {
+	100% {
+		opacity: 0;
+		top: 0;
+		-webkit-transform: translateY(-100%);
+  		transform: translateY(-100%);
+	}
+}
+/*底部下滑关闭*/
+.hclayer-anim-bottomOut {
+	-webkit-animation-name: layer-bottomOut;
+		animation-name: layer-bottomOut;
+			-webkit-animation-duration:.3s;
+			animation-duration:.3s;
+	-webkit-animation-fill-mode: both;
+			animation-fill-mode: both;
+}
+@-webkit-keyframes layer-bottomOut {
+	100% {
+		opacity: 0;
+		bottom: 0;
+		-webkit-transform: translateY(100%);
+  		transform: translateY(100%);
+	}
+}
+@keyframes layer-bottomOut {
+	100% {
+		opacity: 0;
+		bottom: 0;
+		-webkit-transform: translateY(100%);
+  		transform: translateY(100%);
 	}
 }
 

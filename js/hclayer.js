@@ -380,7 +380,7 @@ function getBoundingClientRect(element) {
 function createPopper(content) {
 	var popper = document.createElement('span');
 	popper.innerHTML = content;
-	utils.addClass(popper, 'hclayer-tips');
+	utils.addClass(popper, 'hclayer-tips hclayer-anim hclayer-anim-fadeIn');
 	document.body.appendChild(popper);
 	return popper;
 }
@@ -422,14 +422,16 @@ function handlerListener(reference, popper, type) {
 function closeTips(popper, isEnterPopper) {
 	return setTimeout(function() {
 		if(popper.isEnterPopper) return;
-		/*utils.removeClass(popper, 'hc-is-show');
-		utils.addClass(popper, 'hc-is-hide');*/
+		setTimeout(function() {
+			utils.removeClass(popper, 'hclayer-anim-fadeIn');
+			utils.addClass(popper, 'hclayer-anim-fadeOut');
+		}, 200)
 		utils.css(popper, 'display', 'none');
 	}, 200);
 }
 function showTips(popper) {
-	/*utils.removeClass(popper, 'hc-is-hide');
-	utils.addClass(popper, 'hc-is-show');*/
+	utils.addClass(popper, 'hclayer-anim-fadeIn');
+	utils.removeClass(popper, 'hclayer-anim-fadeOut');
 	utils.css(popper, 'display', 'block');
 }
 var DEFAULT = {
@@ -623,6 +625,15 @@ var hclayer = window.hclayer = {
 				content: content,
 				btn: false
 			})
+		}else if(typeof content === 'object') {
+			opt = utils.extend({}, {
+				type: 'dialog',
+				shade: true,
+				title: '',
+				close: true,
+				content: content.content,
+				btn: false
+			}, content)
 		}
 		var o = new Layer(opt);
 		return o;
@@ -687,6 +698,7 @@ var hclayer = window.hclayer = {
 		return o;
 	},
 
+	// tips 和其他不一样，它用到的构造函数为 Popper，而不是 Layer
 	tips: function(content, id) {
 		var mId = null;
 		var mContent = '';
@@ -740,7 +752,7 @@ var hclayer = window.hclayer = {
 var config = {
 	shade:false, //遮罩层
 	title:false, //标题
-	icon: false, // 开启图标: info/success/help/warn/error（todo: 暂时只有 notice、alert 用到）
+	icon: false, // 开启图标: info/success/help/warn/error（todo: msg|notice、alert 用到）
 	close:false, //关闭按钮
 	//content: //内容
 	btn:false, //底部按钮
@@ -749,12 +761,14 @@ var config = {
 	move:false, //可否拖动
 	zIndex:12345678,
 	time:0,  //为0时不自动关闭
-	type: 'msg',  // msg, alert, load
+	//type: 'msg',  // msg, notice, alert, dialog, load
 	maxWidth: 360,
 	lock: false, //锁滚动条
 	center: false, //内容居中
 	//background: // 控制 alert、load 的背景颜色
-	position: 'top-right', // notice 的位置，top-right\top-left\bottom-right\bottom-left
+	// notice 的位置，top-right\top-left\bottom-right\bottom-left
+	// msg 的位置, top\bottom\(不设置就是默认居中)
+	position: 'top-right',
 	skin: '', // 自定义 class
 	closeOnClickShade: false, // 点击遮罩层是否关闭弹框（目前仅应用到 alert）
 	//el: 'test',  // 用于 tips, 指定应用的元素
@@ -902,7 +916,7 @@ Layer.prototype._createMain = function() {
 		},
 		icon: function() {
 			if(!that.config.icon) return '';
-			if(that.config.type !== 'notice') return '';  //todo：暂时只有 notice、alert 有这功能
+			if(that.config.type !== 'notice' && that.config.type !== 'msg' ) return '';  //todo：只有 notice、msg 应用这块html(alert的icon在content中)
 			if(iconType[that.config.icon]) {
 				return '<div class="hclayer-icon hclayer-icon--'+that.config.icon+'"></div>';	
 			}
@@ -941,6 +955,7 @@ Layer.prototype._createMain = function() {
 			if(that.config.type === 'load') {  // 类型为 load 时
 				return that.config.content;
 			}
+			// content 为元素的情况
 			if(that.config.content instanceof HTMLElement) {
 				var display = utils.css(that.config.content, 'display');
 				that.config.content = that.config.content.cloneNode(true);
@@ -1029,8 +1044,16 @@ Layer.prototype._createMain = function() {
 	// 动画
 	if(that.config.type === 'load') {
 		utils.addClass(main, 'hclayer-anim hclayer-anim-fadeIn');
-	} else if(that.config.type === 'msg' || that.config.type === 'alert' || that.config.type === 'dialog'){
+	} else if(that.config.type === 'alert' || that.config.type === 'dialog'){
 		utils.addClass(main, 'hclayer-anim hclayer-anim-bounceIn');	
+	} else if(that.config.type === 'msg') {
+		if(that.config.position === 'top') {
+			utils.addClass(main, 'hclayer-anim hclayer-anim-topIn');
+		}else if(that.config.position === 'bottom') {
+			utils.addClass(main, 'hclayer-anim hclayer-anim-bottomIn');
+		}else {
+			utils.addClass(main, 'hclayer-anim hclayer-anim-bounceIn');
+		}
 	}
 
 	// 关闭所有
@@ -1105,13 +1128,25 @@ Layer.prototype.setOffset = function(){
 	}
 	// 默认以可视窗口为父元素
 	else{
-		offset = that.offset = {
-			left: (utils.width(window) - area[0])/2,
-			top: (utils.height(window) - area[1])/2
+		if(that.config.position === 'top') {
+			offset = that.offset = {
+				left: (utils.width(window) - area[0])/2,
+				top: 20
+			}
+		}else if(that.config.position === 'bottom') {
+			offset = that.offset = {
+				left: (utils.width(window) - area[0])/2,
+				bottom: 20
+			}
+		}else {
+			offset = that.offset = {
+				left: (utils.width(window) - area[0])/2,
+				top: (utils.height(window) - area[1])/2
+			}
 		}
 	}
 
-	utils.css(main,{left:offset.left, top:offset.top});
+	utils.css(main, offset);
 }
 
 /*按钮的点击事件*/
@@ -1218,8 +1253,16 @@ Layer.prototype.close = function() {
 		//因为 load 和 alert/msg 的关闭动画不一样，所以要区分
 		if(that.config.type === 'load' || that.config.type === 'notice') { 
 			utils.addClass(main,'hclayer-anim-closeFade');
-		} else if(that.config.type === 'msg' || that.config.type === 'alert' || that.config.type === 'dialog') {
+		} else if(that.config.type === 'alert' || that.config.type === 'dialog') {
 			utils.addClass(main,'hclayer-anim-closeBounce');
+		} else if(that.config.type === 'msg') {
+			if(that.config.position === 'top') {
+				utils.addClass(main, 'hclayer-anim-topOut');
+			}else if(that.config.position === 'bottom') {
+				utils.addClass(main, 'hclayer-anim-bottomOut');
+			}else {
+				utils.addClass(main, 'hclayer-anim-closeBounce');
+			}
 		}
 		setTimeout(function(){
 			utils.remove(main);

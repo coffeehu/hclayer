@@ -14,24 +14,6 @@
 		.clearfix:after {
 			clear: both;
 		}
-		#test{
-			background: red;
-			position: static;
-			/*width: 200px;
-			height: 100px;
-			padding: 12px;
-			margin: 30px;
-			border: 5px solid blue;*/
-		}
-		#test2{
-			background: red;
-			position: relative;
-			width: 200px;
-			height: 100px;
-			padding: 12px;
-			margin: 30px;
-			border: 5px solid blue;
-		}
 
 		.module-wrapper {
 		  border: 1px solid #e2e2e2;
@@ -104,6 +86,10 @@
 
 	<div class="module-wrapper root-module loading-module">
       <h1>msg</h1>
+      <button id="msg-default">默认</button>
+      <button id="msg-icon">icon</button>
+      <button id="msg-top">top</button>
+      <button id="msg-bottom">bottom</button>
      </div>
 
 
@@ -159,6 +145,7 @@
 	     	<div style="margin-bottom: 20px;"><button id="tip-top">top(默认)</button></div>
 	     	<div class="clearfix" style="min-width: 150px">
 		     	<button id="tip-left" style="float:left;">left</button>
+		     	<button id="tip-click">click</button>
 		     	<button id="tip-right" style="float:right;">right</button>
 		     </div>
 	     	<div  style="margin-top: 20px"><button id="tip-bottom">bottom</button></div>
@@ -216,6 +203,30 @@
 		content: 'hehe',
 		time: 0
 	});*/
+	$('msg-default').onclick = function() {
+		hclayer.msg('hello');
+	}
+	$('msg-icon').onclick = function() {
+		hclayer.msg({
+			content: 'hello',
+			icon: 'success'
+		});
+	}
+	$('msg-top').onclick = function() {
+		hclayer.msg({
+			content: 'hello',
+			position: 'top',
+			icon: 'error',
+			close: true
+		});
+	}
+	$('msg-bottom').onclick = function() {
+		hclayer.msg({
+			content: 'hello',
+			position: 'bottom',
+			icon: 'help'
+		});
+	}
 
 	/*----------- notice ----------------*/
 	$('notice1').onclick = function() {
@@ -302,11 +313,19 @@
 			no: '取消',
 			noCallback: function(done){
 				done();
-				hclayer.msg('已取消');
+				hclayer.msg({
+					content: '已取消',
+					position: 'top',
+					icon: 'info'
+				});
 			},
 			yesCallback: function(done){
 				done();
-				hclayer.msg('确定');
+				hclayer.msg({
+					content: '确定',
+					position: 'top',
+					icon: 'success'
+				});
 			},
 			title: '标题'
 		});
@@ -324,7 +343,10 @@
 	/*----------- dialog 弹出层 ----------------*/
 	var content1 = $('dialog-content1');
 	$('dialog1').onclick = function() {
-		hclayer.dialog(content1);
+		hclayer.dialog({
+			content: content1,
+			closeOnClickShade: true
+		});
 	}
 
 
@@ -427,6 +449,11 @@
 		content: 'hehe',
 		id: 'tip-left',
 		placement: 'left'
+	});
+	hclayer.tips({
+		content: 'hehe',
+		id: 'tip-click',
+		type: 'click'
 	});
 
 
