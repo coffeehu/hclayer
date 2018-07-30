@@ -1269,6 +1269,17 @@ Layer.prototype.close = function() {
 			}
 		}
 		setTimeout(function(){
+			/*
+				对 dialog 的特殊处理
+				dialog 的 that.config.content 是一个 HTMLElemnt 实例，
+				若不将它 append 到 body 上，那么关闭时这个实例就仅保存在内存中，
+				只要页面发生 DOM 改变，那么这个实例就会被销毁，造成下一次调用 Dialog 显示没有内容，
+				因此需要 append to body，保持 hold 状态
+			*/
+			if(that.config.type === 'dialog') {
+				utils.css(that.config.content, 'display', 'none');
+				document.body.appendChild(that.config.content);
+			}
 			utils.remove(main);
 
 			// load()：移除父类添加的 is-relative 类
