@@ -772,6 +772,7 @@ var config = {
 	skin: '', // 自定义 class
 	closeOnClickShade: false, // 点击遮罩层是否关闭弹框（目前仅应用到 alert）
 	//el: 'test',  // 用于 tips, 指定应用的元素
+	//openCallback: function(){}, // dialog 打开时的回调函数
 };
 var iconType = {
 	info: true,
@@ -848,6 +849,9 @@ Layer.prototype.create = function(){
 		var content = document.getElementById('hclayer--temp-content');
 		content.appendChild(that.config.content);
 		content.removeAttribute('id');
+		if(typeof that.config.openCallback === 'function') {
+			that.config.openCallback();
+		}
 	}
 
 	// notice 的处理: 当页面存在多个 notice 时，依次偏移
@@ -958,7 +962,7 @@ Layer.prototype._createMain = function() {
 			// content 为元素的情况
 			if(that.config.content instanceof HTMLElement) {
 				var display = utils.css(that.config.content, 'display');
-				that.config.content = that.config.content.cloneNode(true);
+				//that.config.content = that.config.content.cloneNode(true);
 				if(display === 'none') {
 					utils.css(that.config.content, 'display', 'block');	
 				}				
