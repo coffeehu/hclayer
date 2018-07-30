@@ -850,7 +850,7 @@ Layer.prototype.create = function(){
 		content.appendChild(that.config.content);
 		content.removeAttribute('id');
 		if(typeof that.config.openCallback === 'function') {
-			that.config.openCallback();
+			that.config.openCallback(that);
 		}
 	}
 
@@ -972,11 +972,11 @@ Layer.prototype._createMain = function() {
 			// 注意，alert 居中的时候，icon 是设置在 title 上的
 			if(that.config.type === 'alert' && that.config.icon && !that.config.center) {
 				if(iconType[that.config.icon]) {
-					return '<div class="hclayer-content"><div class="hclayer-icon hclayer-icon--'+that.config.icon+'"></div><div class="hclayer-content--inner">'+that.config.content+'</div></div>';	
+					return '<div class="hclayer-content hclayer-content-clear"><div class="hclayer-icon hclayer-icon--'+that.config.icon+'"></div><div class="hclayer-content--inner">'+that.config.content+'</div></div>';	
 				}
-				return '<div class="hclayer-content"><div class="'+that.config.icon+'"></div><div class="hclayer-content--inner">'+that.config.content+'</div></div>';
+				return '<div class="hclayer-content hclayer-content-clear"><div class="'+that.config.icon+'"></div><div class="hclayer-content--inner">'+that.config.content+'</div></div>';
 			}
-			return '<div class="hclayer-content">'+that.config.content+'</div>';
+			return '<div class="hclayer-content hclayer-content-clear">'+that.config.content+'</div>';
 		},
 		btn: function() {
 			if(!that.config.btn) return '';

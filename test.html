@@ -345,7 +345,10 @@
 	$('dialog1').onclick = function() {
 		hclayer.dialog({
 			content: content1,
-			closeOnClickShade: true
+			closeOnClickShade: true,
+			openCallback: function(dialog) {
+				console.log('dialog', dialog);
+			}
 		});
 	}
 
